@@ -9,6 +9,7 @@
 #include "imgui_impl_dx11.h"
 
 #include <string>
+#include "your'ryWinAPI.h"
 
 extern void ExitGame() noexcept;
 
@@ -107,7 +108,7 @@ void Game::Tick()
 void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
-
+    UpdateKeyboard();
 
     //ImGui::Begin("aTestWindow");
     //{

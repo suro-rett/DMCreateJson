@@ -7,6 +7,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <Vector>
+#include "your'ryWinAPI.h"
 
 void MainScreen::Update() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -82,12 +83,46 @@ void MainScreen::KeyPanel() {
         }
 
         if (simageList[i].changeButton) {
-            ImGui::SetNextWindowSize(ImVec2(350, 200));
-            ImGui::Begin("ボタン変更", nullptr,ImGuiWindowFlags_NoDocking);
-            ImGui::Text("反応させたいキー・ボタンを押してください");
-            ImGui::Text("元のままにする場合は×ボタンを押してください");
+            ImGui::SetNextWindowSize(ImVec2(400, 200));
+            ImGui::OpenPopup("ボタン変更");
+            if (ImGui::BeginPopupModal( "ボタン変更", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                ImGui::Text("反応させたいキー・ボタンを押してください");
+                ImGui::Text("元のままにする場合はキャンセルを,");
+                ImGui::Text("IDLE(基本的な状態で流れる)にする場合はIDLEを押してください");
+                ImGui::Text("");
+                float buttonWidth = 100.0f;
+                float spacing = ImGui::GetStyle().ItemSpacing.x;
 
-            ImGui::End();
+                float totalWidth = buttonWidth * 2 + spacing;
+
+                float startX =(ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
+
+                if (ImGui::Button("キャンセル", ImVec2(buttonWidth, 50)))
+                {
+                    simageList[i].changeButton = false;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("IDLE", ImVec2(buttonWidth, 50)))
+                {
+                    simageList[i].imageList.SetKey(IDLE);
+                    simageList[i].changeButton = false;
+                }
+
+                if (simageList[i].changeButton) {
+                    for (int j = 0; j < 256; j++) {
+                        if (IsKeyDown(j)) {
+                            simageList[i].imageList.SetKey(j);
+                            simageList[i].changeButton = false;
+                        }
+                    }
+                }
+
+
+                ImGui::EndPopup();
+            }
         }
 
         ImGui::PopID();

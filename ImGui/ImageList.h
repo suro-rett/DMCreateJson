@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <String>
 #include <memory>
 #include <Vector>
@@ -8,7 +8,7 @@
 
 class ImageList {
 private:
-	int key = IDLE;
+	int vkey = IDLE;
 
 	std::vector<std::string> imagePaths;
 
@@ -22,4 +22,5 @@ public:
 	~ImageList(){}
 
 	std::string GetKey();
+	void SetKey(int setKey);
 };
