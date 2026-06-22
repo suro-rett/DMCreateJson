@@ -90,8 +90,10 @@ void Game::Tick()
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    ////  デモウィンドウの描画
-    //ImGui::ShowDemoWindow();
+
+    //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+    mainScreen.Update();
 
     m_timer.Tick([&]()
     {
@@ -106,7 +108,6 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
 
-    mainScreen.Update();
 
     //ImGui::Begin("aTestWindow");
     //{

@@ -58,6 +58,12 @@
     <ClInclude Include="MainScreen.h">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="ImageList.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="your%27ryWinAPI.h">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeviceResources.cpp">
@@ -94,6 +100,12 @@
       <Filter>imuGui</Filter>
     </ClCompile>
     <ClCompile Include="MainScreen.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="your%27ryWinAPI.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageList.cpp">
       <Filter>cpp</Filter>
     </ClCompile>
   </ItemGroup>
