@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ImageList.h"
 
 struct sImageList
@@ -18,4 +18,10 @@ private:
 	void ConfigPanel();
 
 	std::vector<sImageList> simageList;
+
+	int choicesImageList = 0;
+	bool choiceNormal = false;
+
+	//ImGui::Textにて表示されるtextをウィンドウの中心に表示する
+	void CenterImGuiText(const char* text);
 };

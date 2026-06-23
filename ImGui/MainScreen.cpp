@@ -139,8 +139,14 @@ void MainScreen::ImagePanel() {
     ImGui::TableNextColumn();
 
     ImGui::BeginChild("ImageList");
-
     ImGui::Text("画像リスト");
+
+    if (!choiceNormal) {
+        CenterImGuiText("←　キー・ボタンのボタンを");
+        CenterImGuiText("クリックすると");
+        CenterImGuiText("此処が表示されます");
+    }
+
 
     ImGui::EndChild();
 }
@@ -149,4 +155,16 @@ void MainScreen::ConfigPanel() {
     ImGui::TableNextColumn();
 
     ImGui::Text("設定");
+}
+
+
+void MainScreen::CenterImGuiText(const char* text) {
+    ImVec2 textSize = ImGui::CalcTextSize(text);
+    ImVec2 windowSize = ImGui::GetWindowSize();
+
+    ImGui::SetCursorPosX(
+        (windowSize.x - textSize.x) * 0.5f
+    );
+
+    ImGui::Text("%s", text);
 }
