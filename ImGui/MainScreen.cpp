@@ -112,10 +112,11 @@ void MainScreen::KeyPanel() {
                 }
 
                 if (simageList[i].changeButton) {
-                    for (int j = 0; j < 256; j++) {
-                        if (IsKeyDown(j)) {
+                    for (int j = 0; j < 166; j++) {//166なのはVkで0xA1以降はあまり意味がないため
+                        if (IsKeyReleased(j)) {
                             simageList[i].imageList.SetKey(j);
                             simageList[i].changeButton = false;
+                            break;
                         }
                     }
                 }

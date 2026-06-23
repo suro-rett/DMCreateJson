@@ -23,4 +23,5 @@ public:
 
 	std::string GetKey();
 	void SetKey(int setKey);
+	bool IsNormal() { return GetKey() != "不明"; }
 };

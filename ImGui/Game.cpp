@@ -92,6 +92,8 @@ void Game::Tick()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
+    UpdateKeyboard();
+
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
     mainScreen.Update();
@@ -108,7 +110,6 @@ void Game::Tick()
 void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
-    UpdateKeyboard();
 
     //ImGui::Begin("aTestWindow");
     //{

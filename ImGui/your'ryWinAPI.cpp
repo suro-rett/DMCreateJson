@@ -12,32 +12,27 @@ bool nowKey[KEY_COUNT] = {};
 
 void UpdateKeyboard()
 {
-    // 全キー更新
+    memcpy(prevKey, nowKey, sizeof(nowKey));
+
     for (int key = 0; key < KEY_COUNT; key++)
     {
-        nowKey[key] = (GetAsyncKeyState(key) & 0x8000);
+        nowKey[key] = (GetAsyncKeyState(key) & 0x8000) != 0;
     }
-
-    // 前フレーム更新
-    memcpy(prevKey,nowKey,sizeof(nowKey));
-
 }
 
 bool IsKeyDown(int key)
 {
-    return nowKey[key];
+    return (0 <= key && key < KEY_COUNT)? nowKey[key]: false;
 }
 
 bool IsKeyPressed(int key)
 {
-    return nowKey[key] &&
-        !prevKey[key];
+    return (0 <= key && key < KEY_COUNT)? nowKey[key] && !prevKey[key]: false;
 }
 
 bool IsKeyReleased(int key)
 {
-    return !nowKey[key] &&
-        prevKey[key];
+    return (0 <= key && key < KEY_COUNT)? !nowKey[key] && prevKey[key] : false;
 }
 
 std::wstring StringToWString(const std::string& str)
