@@ -54,9 +54,17 @@ void MainScreen::KeyPanel() {
     for (size_t i = 0; i < simageList.size(); i++)
     {
         ImGui::PushID((int)i);
-
+        bool current = (i == choicesImageList);
+        if (current)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(0.4f, 0.5f, 0.0f, 1.0f));  //選択中の場合はボタンの色変更
+        }
         if(ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.7f, 100))){
             choicesImageList = (int)i;
+        }
+        if (current)
+        {
+            ImGui::PopStyleColor();
         }
 
         ImGui::SameLine();
@@ -145,6 +153,7 @@ void MainScreen::ImagePanel() {
     ImGui::BeginChild("ImageList");
     ImGui::Text("画像リスト");
 
+ 
     if (choicesImageList == -1) {
         CenterImGuiText("←　キー・ボタンのボタンを");
         CenterImGuiText("クリックすると");

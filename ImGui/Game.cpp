@@ -61,7 +61,7 @@ void Game::Initialize(HWND window, int width, int height)
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF(
         "C:\\Windows\\Fonts\\meiryo.ttc",
-        18.0f,
+        24.0f,
         nullptr,
         io.Fonts->GetGlyphRangesJapanese()
     );

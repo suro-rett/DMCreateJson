@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ImageList.h"
 #include "DeviceResources.h"
+#include "imgui.h"
 
 struct sImageList
 {
@@ -25,6 +26,7 @@ private:
 	void ImagePanel();
 	void ConfigPanel();
 
+
 	DX::DeviceResources* deviceResources;
 
 	std::vector<sImageList> simageList;
@@ -35,3 +37,14 @@ private:
 	//ImGui::Textにて表示されるtextをウィンドウの中心に表示する
 	void CenterImGuiText(const char* text);
 };
+
+//ImFont* SetFontSizeJapanese(float size, ImGuiIO& io, const char* font = "") {
+//	ImFont* imFont;
+//	if (font == "") {
+//		return io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\meiryo.ttc", size, nullptr, io.Fonts->GetGlyphRangesJapanese());
+//	}
+//	else {
+//		return io.Fonts->AddFontFromFileTTF(font, size, nullptr, io.Fonts->GetGlyphRangesJapanese());
+//	}
+//	return imFont;
+//}
