@@ -22,8 +22,10 @@ std::string substrBack(std::string str, size_t pos, size_t len);
 void PrintMemoryUsage();
 //エクスプローラーを開きイメージ画像を選択でき、絶対パスを返す
 std::string OpenImageFile();
-//受けっとったファイルパスから実行ファイルからの相対パス取得
+
+//受けっとったファイルパスから実行ファイルからの相対パス取得 動作不安定？
 std::string GetRelativePath(const std::string& targetPath);
+
 //実行EXEの絶対パスを返す
 std::string GetRelativePath();
 //エクスプローラーを開き引数の通りにファイルを新規・上書き保存する　

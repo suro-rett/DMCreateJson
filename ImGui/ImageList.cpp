@@ -1,7 +1,10 @@
 ﻿#pragma execution_character_set("utf-8")
 
+#include "pch.h"
 #include "ImageList.h"
-
+#include <WICTextureLoader.h>
+#include "your'ryWinAPI.h"
+#include "imgui.h"
 
 std::string ImageList::GetKey() {
 
@@ -9,7 +12,7 @@ std::string ImageList::GetKey() {
 
     switch (vkey)
     {
-    case IDLE:          name = "IDLE";             break;
+    case IDLE:          name = "IDLE";                   break;
 
     case VK_LBUTTON:    name = "マウス左ボタン";         break;
     case VK_RBUTTON:    name = "マウス右ボタン";         break;
@@ -120,3 +123,96 @@ std::string ImageList::GetKey() {
 void ImageList::SetKey(int setKey) {
 	vkey = setKey;
 }
+
+void ImageList::SetAllImage() {
+    for (auto& Path : simagePath) {
+        if (Path.imagePaths != "") {
+            HRESULT hr = DirectX::CreateWICTextureFromFile(
+                deviceResources->GetD3DDevice(),
+                StringToWString(Path.imagePaths.c_str()).c_str(),
+                nullptr,
+                Path.texture.GetAddressOf());
+            if (FAILED(hr))
+            {
+                OutputDebugStringA("Load Failed\n");
+            }
+        }
+    }
+}
+
+
+void ImageList::ResetAllImage() {
+    for (auto& Path : simagePath) {
+        if (Path.texture != nullptr) {
+            Path.texture.Reset();
+        }
+    }
+}
+
+void ImageList::SetImageData(int Vector,std::string path) {
+    if (path != "") {
+        simagePath[Vector].imagePaths = path;
+        simagePath[Vector].texture.Reset();
+        if (simagePath[Vector].imagePaths != "NoData") {
+            simagePath[Vector].texture.Reset();
+            HRESULT hr = DirectX::CreateWICTextureFromFile(
+                deviceResources->GetD3DDevice(),
+                StringToWString(path.c_str()).c_str(),
+                nullptr,
+                simagePath[Vector].texture.GetAddressOf());
+            if (FAILED(hr))
+            {
+                OutputDebugStringA("Load Failed\n");
+            }
+        }
+    }
+}
+
+
+void ImageList::Update() {
+    float width = ImGui::GetContentRegionAvail().x;
+
+    if (ImGui::Button("+", ImVec2(width, 100)))
+    {
+        simagePath.push_back({ });
+        SetImageData((int)simagePath.size() - 1, OpenImageFile());
+    }
+
+    for (size_t i = 0; i < simagePath.size(); i++)
+    {
+        ImGui::PushID((int)i);
+
+        if (ImGui::Button(simagePath[i].imagePaths.c_str(), ImVec2(width * 0.7f, 100))) {
+            SetImageData((int)i, OpenImageFile());
+        }
+
+        ImGui::SameLine();
+        ImGui::BeginGroup();
+
+        if (ImGui::Button("X"))
+        {
+            simagePath.erase(simagePath.begin() + i);
+            ImGui::PopID();
+            ImGui::EndGroup();
+            break;
+        }
+
+        //if (ImGui::Button("ボタン変更"))
+        //{
+        //    if (!simageList[i].changeButton) {
+        //        simageList[i].changeButton = true;
+
+        //        ImGui::PopID();
+        //        ImGui::EndGroup();
+        //        break;
+        //    }
+        //}
+
+        ImGui::PopID();
+
+        ImGui::EndGroup();
+    }
+
+
+}
+

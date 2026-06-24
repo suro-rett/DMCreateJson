@@ -9,6 +9,7 @@ constexpr int KEY_COUNT = 256;
 
 bool prevKey[KEY_COUNT] = {};
 bool nowKey[KEY_COUNT] = {};
+std::string m_lastFolder;
 
 void UpdateKeyboard()
 {
@@ -83,7 +84,9 @@ std::string OpenImageFile()
     ofn.lpstrFile = fileName;
     ofn.nMaxFile = MAX_PATH;
 
+    std::string a = GetRelativePath();
 
+    ofn.lpstrInitialDir = m_lastFolder.empty()? a.c_str() : m_lastFolder.c_str();
     // png,gif,jpg,bmpのみ表示
     ofn.lpstrFilter =
         "Image Files\0*.png;*.gif;*.jpg;*.jpeg;*.bmp\0"
@@ -93,6 +96,8 @@ std::string OpenImageFile()
 
     if (GetOpenFileNameA(&ofn))
     {
+            m_lastFolder = std::filesystem::path(fileName).parent_path().string();
+        
         return fileName;
     }
 

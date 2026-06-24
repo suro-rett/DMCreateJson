@@ -48,22 +48,26 @@ void MainScreen::KeyPanel() {
 
     if (ImGui::Button("+", ImVec2(width , 100)))
     {
-        simageList.push_back({});
+        simageList.push_back({deviceResources});
     }
 
     for (size_t i = 0; i < simageList.size(); i++)
     {
         ImGui::PushID((int)i);
 
-        ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.7f, 100));
+        if(ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.7f, 100))){
+            choicesImageList = (int)i;
+        }
 
         ImGui::SameLine();
-
         ImGui::BeginGroup();
 
         if (ImGui::Button("X"))
         {
             if (!simageList[i].changeButton) {
+                if (choicesImageList == i) {
+                    choicesImageList = -1;
+                }
                 simageList.erase(simageList.begin() + i);
                 ImGui::PopID();
                 ImGui::EndGroup();
@@ -141,11 +145,15 @@ void MainScreen::ImagePanel() {
     ImGui::BeginChild("ImageList");
     ImGui::Text("画像リスト");
 
-    if (!choiceNormal) {
+    if (choicesImageList == -1) {
         CenterImGuiText("←　キー・ボタンのボタンを");
         CenterImGuiText("クリックすると");
         CenterImGuiText("此処が表示されます");
     }
+    else {
+        simageList[choicesImageList].imageList.Update();
+    }
+
 
 
     ImGui::EndChild();
