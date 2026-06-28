@@ -10,6 +10,7 @@ constexpr int KEY_COUNT = 256;
 bool prevKey[KEY_COUNT] = {};
 bool nowKey[KEY_COUNT] = {};
 std::string m_lastFolder;
+std::wstring m_wlastFolder;
 
 void UpdateKeyboard()
 {
@@ -74,7 +75,7 @@ void PrintMemoryUsage() {
     //}
 }
 
-std::string OpenImageFile()
+std::string OpenImageFileA()
 {
     char fileName[MAX_PATH] = {};
 
@@ -102,6 +103,35 @@ std::string OpenImageFile()
     }
 
     return "";
+}
+std::wstring OpenImageFileW()
+{
+    wchar_t fileName[MAX_PATH] = {};
+
+    OPENFILENAMEW ofn = {};
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = nullptr;
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+
+    std::wstring initialDir = StringToWString(GetRelativePath());
+
+    ofn.lpstrInitialDir =
+        m_wlastFolder.empty() ? initialDir.c_str() : m_wlastFolder.c_str();
+
+    ofn.lpstrFilter =
+        L"Image Files\0*.png;*.gif;*.jpg;*.jpeg;*.bmp\0"
+        L"All Files\0*.*\0";
+
+    ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+    if (GetOpenFileNameW(&ofn))
+    {
+        m_wlastFolder = std::filesystem::path(fileName).parent_path().wstring();
+        return fileName;
+    }
+
+    return L"";
 }
 
 std::string GetRelativePath(const std::string& targetPath)

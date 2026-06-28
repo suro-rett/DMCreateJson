@@ -7,15 +7,21 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 #include "DeviceResources.h"
+#include "imgui.h"
 
 using Microsoft::WRL::ComPtr;
+#define MAXHEIGHT 300.0f
 
 #define IDLE 256
 
 struct sImagePath
 {
-	std::string imagePaths = "NoData";
+	std::wstring imagePaths = L"NoData";
 	ComPtr<ID3D11ShaderResourceView> texture;
+
+	UINT textureWidth  = 1;
+	UINT textureHeight = 1;
+
 };
 
 class ImageList {
@@ -31,6 +37,8 @@ private:
 	bool loop = true;
 
 	DX::DeviceResources* deviceResources;
+	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
+	ImVec2 SetSize(const sImagePath& imagePath);
 public:
 	ImageList(DX::DeviceResources* DeviceResources):deviceResources(DeviceResources){}
 	~ImageList(){}
@@ -41,7 +49,7 @@ public:
 
 	void SetAllImage();
 	void ResetAllImage();
-	void SetImageData(int Vector, std::string path);
+	void SetImageData(int Vector, std::wstring path);
 
 	void Update();
 };

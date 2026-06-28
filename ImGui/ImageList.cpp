@@ -4,7 +4,6 @@
 #include "ImageList.h"
 #include <WICTextureLoader.h>
 #include "your'ryWinAPI.h"
-#include "imgui.h"
 
 std::string ImageList::GetKey() {
 
@@ -126,10 +125,10 @@ void ImageList::SetKey(int setKey) {
 
 void ImageList::SetAllImage() {
     for (auto& Path : simagePath) {
-        if (Path.imagePaths != "") {
+        if (Path.imagePaths != L"") {
             HRESULT hr = DirectX::CreateWICTextureFromFile(
                 deviceResources->GetD3DDevice(),
-                StringToWString(Path.imagePaths.c_str()).c_str(),
+                Path.imagePaths.c_str(),
                 nullptr,
                 Path.texture.GetAddressOf());
             if (FAILED(hr))
@@ -149,18 +148,21 @@ void ImageList::ResetAllImage() {
     }
 }
 
-void ImageList::SetImageData(int Vector,std::string path) {
-    if (path != "") {
+void ImageList::SetImageData(int Vector,std::wstring path) {
+    if (path != L"") {
         simagePath[Vector].imagePaths = path;
         simagePath[Vector].texture.Reset();
-        if (simagePath[Vector].imagePaths != "NoData") {
+        if (simagePath[Vector].imagePaths != L"NoData") {
             simagePath[Vector].texture.Reset();
             HRESULT hr = DirectX::CreateWICTextureFromFile(
                 deviceResources->GetD3DDevice(),
-                StringToWString(path.c_str()).c_str(),
+                path.c_str(),
                 nullptr,
                 simagePath[Vector].texture.GetAddressOf());
-            if (FAILED(hr))
+            if (SUCCEEDED(hr)) {
+                GetTextureSize(simagePath[Vector].texture.Get(), simagePath[Vector].textureWidth, simagePath[Vector].textureHeight);
+            }
+            else if (FAILED(hr))
             {
                 OutputDebugStringA("Load Failed\n");
             }
@@ -170,20 +172,26 @@ void ImageList::SetImageData(int Vector,std::string path) {
 
 
 void ImageList::Update() {
-    float width = ImGui::GetContentRegionAvail().x;
-
-    if (ImGui::Button("+", ImVec2(width, 100)))
+    if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvail().x, 100)))
     {
         simagePath.push_back({ });
-        SetImageData((int)simagePath.size() - 1, OpenImageFile());
+        SetImageData((int)simagePath.size() - 1, OpenImageFileW());
     }
 
     for (size_t i = 0; i < simagePath.size(); i++)
     {
         ImGui::PushID((int)i);
 
-        if (ImGui::Button(simagePath[i].imagePaths.c_str(), ImVec2(width * 0.7f, 100))) {
-            SetImageData((int)i, OpenImageFile());
+        if (!simagePath[i].texture) {
+            if (ImGui::Button("NoData", ImVec2(ImGui::GetContentRegionAvail().x * 0.8f, 100))) {
+                SetImageData((int)i, OpenImageFileW());
+            }
+        }
+        else {
+            if (ImGui::ImageButton("Image", (ImTextureID)simagePath[i].texture.Get(), SetSize(simagePath[i])))
+            {
+                SetImageData((int)i, OpenImageFileW());
+            }
         }
 
         ImGui::SameLine();
@@ -197,22 +205,48 @@ void ImageList::Update() {
             break;
         }
 
-        //if (ImGui::Button("ボタン変更"))
-        //{
-        //    if (!simageList[i].changeButton) {
-        //        simageList[i].changeButton = true;
-
-        //        ImGui::PopID();
-        //        ImGui::EndGroup();
-        //        break;
-        //    }
-        //}
-
         ImGui::PopID();
 
         ImGui::EndGroup();
     }
 
 
+}
+
+bool ImageList::GetTextureSize(ID3D11ShaderResourceView* srv,UINT& width,UINT& height)
+{
+    if (!srv)
+        return false;
+
+    Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+    srv->GetResource(resource.GetAddressOf());
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    if (FAILED(resource.As(&texture)))
+        return false;
+
+    D3D11_TEXTURE2D_DESC desc;
+    texture->GetDesc(&desc);
+
+    width = desc.Width;
+    height = desc.Height;
+
+    return true;
+}
+
+ImVec2 ImageList::SetSize(const sImagePath& imagePath)
+{
+    if (imagePath.textureWidth == 0 || imagePath.textureHeight == 0)
+    {
+        return ImVec2(0.0f, 0.0f);
+    }
+
+    float maxWidth = ImGui::GetContentRegionAvail().x * 0.8f;
+
+    float Scale = std::min(
+        maxWidth / static_cast<float>(imagePath.textureWidth),
+        MAXHEIGHT / static_cast<float>(imagePath.textureHeight));
+
+    return ImVec2(imagePath.textureWidth * Scale,imagePath.textureHeight * Scale);
 }
 
