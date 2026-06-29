@@ -126,9 +126,15 @@ void ImageList::SetKey(int setKey) {
 void ImageList::SetAllImage() {
     for (auto& Path : simagePath) {
         if (Path.imagePaths != L"") {
-            HRESULT hr = DirectX::CreateWICTextureFromFile(
+            HRESULT hr = DirectX::CreateWICTextureFromFileEx(
                 deviceResources->GetD3DDevice(),
                 Path.imagePaths.c_str(),
+                0,
+                D3D11_USAGE_DEFAULT,
+                D3D11_BIND_SHADER_RESOURCE,
+                0,
+                0,
+                DirectX::WIC_LOADER_FORCE_RGBA32,
                 nullptr,
                 Path.texture.GetAddressOf());
             if (FAILED(hr))
@@ -154,9 +160,16 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
         simagePath[Vector].texture.Reset();
         if (simagePath[Vector].imagePaths != L"NoData") {
             simagePath[Vector].texture.Reset();
-            HRESULT hr = DirectX::CreateWICTextureFromFile(
+
+            HRESULT hr = DirectX::CreateWICTextureFromFileEx(
                 deviceResources->GetD3DDevice(),
                 path.c_str(),
+                0,
+                D3D11_USAGE_DEFAULT,
+                D3D11_BIND_SHADER_RESOURCE,
+                0,
+                0,
+                DirectX::WIC_LOADER_FORCE_RGBA32,
                 nullptr,
                 simagePath[Vector].texture.GetAddressOf());
             if (SUCCEEDED(hr)) {
