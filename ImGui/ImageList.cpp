@@ -124,22 +124,24 @@ void ImageList::SetKey(int setKey) {
 }
 
 void ImageList::SetAllImage() {
-    for (auto& Path : simagePath) {
-        if (Path.imagePaths != L"") {
-            HRESULT hr = DirectX::CreateWICTextureFromFileEx(
-                deviceResources->GetD3DDevice(),
-                Path.imagePaths.c_str(),
-                0,
-                D3D11_USAGE_DEFAULT,
-                D3D11_BIND_SHADER_RESOURCE,
-                0,
-                0,
-                DirectX::WIC_LOADER_FORCE_RGBA32,
-                nullptr,
-                Path.texture.GetAddressOf());
-            if (FAILED(hr))
-            {
-                OutputDebugStringA("Load Failed\n");
+    if (simagePath.size() != 0) {
+        for (auto& Path : simagePath) {
+            if (Path.imagePaths != L"") {
+                HRESULT hr = DirectX::CreateWICTextureFromFileEx(
+                    deviceResources->GetD3DDevice(),
+                    Path.imagePaths.c_str(),
+                    0,
+                    D3D11_USAGE_DEFAULT,
+                    D3D11_BIND_SHADER_RESOURCE,
+                    0,
+                    0,
+                    DirectX::WIC_LOADER_FORCE_RGBA32,
+                    nullptr,
+                    Path.texture.GetAddressOf());
+                if (FAILED(hr))
+                {
+                    OutputDebugStringA("Load Failed\n");
+                }
             }
         }
     }
@@ -147,9 +149,11 @@ void ImageList::SetAllImage() {
 
 
 void ImageList::ResetAllImage() {
-    for (auto& Path : simagePath) {
-        if (Path.texture != nullptr) {
-            Path.texture.Reset();
+    if (simagePath.size() != 0) {
+        for (auto& Path : simagePath) {
+            if (Path.texture != nullptr) {
+                Path.texture.Reset();
+            }
         }
     }
 }
@@ -185,6 +189,8 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
 
 
 void ImageList::Update() {
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
+
     if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvail().x, 100)))
     {
         simagePath.push_back({ });
@@ -223,7 +229,7 @@ void ImageList::Update() {
         ImGui::EndGroup();
     }
 
-
+    ImGui::PopStyleColor();
 }
 
 bool ImageList::GetTextureSize(ID3D11ShaderResourceView* srv,UINT& width,UINT& height)

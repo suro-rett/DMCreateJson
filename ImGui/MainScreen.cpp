@@ -21,6 +21,7 @@ void MainScreen::Update() {
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse;
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.3f, 0.4f, 0.4f, 1.0f));
     ImGui::Begin("MainWindow", nullptr, flags);
 
     if (ImGui::BeginTable("MainTable", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV))
@@ -34,6 +35,7 @@ void MainScreen::Update() {
 
     ImGui::End();
 
+    ImGui::PopStyleColor(); // スタイルを元に戻す
 }
 
 void MainScreen::KeyPanel() {
@@ -45,33 +47,39 @@ void MainScreen::KeyPanel() {
 
     float width = ImGui::GetContentRegionAvail().x;
 
-
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
     if (ImGui::Button("+", ImVec2(width , 100)))
     {
         simageList.push_back({deviceResources});
     }
-
+    ImGui::PopStyleColor();
     for (size_t i = 0; i < simageList.size(); i++)
     {
         ImGui::PushID((int)i);
         bool current = (i == choicesImageList);
         if (current)
         {
-            ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(0.4f, 0.5f, 0.0f, 1.0f));  //選択中の場合はボタンの色変更
+            ImGui::PushStyleColor(ImGuiCol_Button,ImVec4(0.8f, 0.5f, 0.0f, 1.0f));  //選択中の場合はボタンの色変更
         }
-        if(ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.7f, 100))){
+        else {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
+        }
+        if(ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.5f, 100))){
+            if(choicesImageList != -1)simageList[choicesImageList].imageList.ResetAllImage();
             choicesImageList = (int)i;
+            simageList[choicesImageList].imageList.SetAllImage();
         }
-        if (current)
-        {
-            ImGui::PopStyleColor();
-        }
+
+        ImGui::PopStyleColor();
+        
 
         ImGui::SameLine();
         ImGui::BeginGroup();
 
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
         if (ImGui::Button("X"))
         {
+            ImGui::PopStyleColor();
             if (!simageList[i].changeButton) {
                 if (choicesImageList == i) {
                     choicesImageList = -1;
@@ -86,6 +94,7 @@ void MainScreen::KeyPanel() {
         if (ImGui::Button("ボタン変更"))
         {
             if (!simageList[i].changeButton) {
+                ImGui::PopStyleColor();
                 simageList[i].changeButton = true;
 
                 ImGui::PopID();
@@ -93,8 +102,10 @@ void MainScreen::KeyPanel() {
                 break;
             }
         }
+        ImGui::PopStyleColor();
 
         if (simageList[i].changeButton) {
+
             ImGui::SetNextWindowSize(ImVec2(400, 200));
             ImGui::OpenPopup("ボタン変更");
             if (ImGui::BeginPopupModal( "ボタン変更", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
