@@ -178,12 +178,43 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
                 simagePath[Vector].texture.GetAddressOf());
             if (SUCCEEDED(hr)) {
                 GetTextureSize(simagePath[Vector].texture.Get(), simagePath[Vector].textureWidth, simagePath[Vector].textureHeight);
+                if (simagePath[Vector].textureWidth % 2 == 1 || simagePath[Vector].textureHeight % 2 == 1) {
+                    simagePath[Vector].texture.Reset();
+                    simagePath[Vector].imagePaths = L"NoData";
+                    PopUpSizeError = true;
+                }
             }
             else if (FAILED(hr))
             {
                 OutputDebugStringA("Load Failed\n");
             }
         }
+    }
+}
+
+void ImageList::SizeError() {
+    ImGui::SetNextWindowSize(ImVec2(500, 200));
+    ImGui::OpenPopup("画像設定失敗");
+    if (ImGui::BeginPopupModal("画像設定失敗", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("");
+        ImGui::Text("画像サイズは高さ・幅どちらも偶数サイズである必要があります");
+        ImGui::Text("");
+        float buttonWidth = 100.0f;
+        float spacing = ImGui::GetStyle().ItemSpacing.x;
+
+        float totalWidth = buttonWidth  + spacing;
+
+        float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
+
+        if (ImGui::Button("OK", ImVec2(buttonWidth, 50)))
+        {
+            PopUpSizeError = false;
+        }
+
+        ImGui::EndPopup();
     }
 }
 
@@ -229,6 +260,7 @@ void ImageList::Update() {
         ImGui::EndGroup();
     }
 
+    if (PopUpSizeError)SizeError();
     ImGui::PopStyleColor();
 }
 

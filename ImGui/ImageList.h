@@ -36,9 +36,12 @@ private:
 
 	bool loop = true;
 
+	bool PopUpSizeError = false;
+
 	DX::DeviceResources* deviceResources;
 	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
 	ImVec2 SetSize(const sImagePath& imagePath);
+	void SizeError();
 public:
 	ImageList(DX::DeviceResources* DeviceResources):deviceResources(DeviceResources){}
 	~ImageList(){}
