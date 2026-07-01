@@ -167,7 +167,7 @@ void MainScreen::ImagePanel() {
  
     if (choicesImageList == -1) {
         CenterImGuiText("←　キー・ボタンのボタンを");
-        CenterImGuiText("クリックすると");
+        CenterImGuiText("選択すると");
         CenterImGuiText("此処が表示されます");
     }
     else {
@@ -181,8 +181,17 @@ void MainScreen::ImagePanel() {
 
 void MainScreen::ConfigPanel() {
     ImGui::TableNextColumn();
+    ImGui::BeginChild("Config");
 
     ImGui::Text("設定");
+    if (choicesImageList == -1) {
+
+    }
+    else {
+        ImGui::Text("プレビュー");
+    }
+
+    ImGui::EndChild();
 }
 
 

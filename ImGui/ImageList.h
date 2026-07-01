@@ -19,8 +19,8 @@ struct sImagePath
 	std::wstring imagePaths = L"NoData";
 	ComPtr<ID3D11ShaderResourceView> texture;
 
-	UINT textureWidth  = 1;
-	UINT textureHeight = 1;
+	UINT textureWidth  = 0;
+	UINT textureHeight = 0;
 
 };
 
@@ -38,10 +38,13 @@ private:
 
 	bool PopUpSizeError = false;
 
+	bool sizeMismatch = false;
+
 	DX::DeviceResources* deviceResources;
 	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
 	ImVec2 SetSize(const sImagePath& imagePath);
 	void SizeError();
+	void CheckSize();
 public:
 	ImageList(DX::DeviceResources* DeviceResources):deviceResources(DeviceResources){}
 	~ImageList(){}
@@ -50,6 +53,7 @@ public:
 	void SetKey(int setKey);
 	bool IsNormal() { return GetKey() != "不明"; }
 
+	const std::vector<sImagePath>& GetImagePaths();
 	void SetAllImage();
 	void ResetAllImage();
 	void SetImageData(int Vector, std::wstring path);

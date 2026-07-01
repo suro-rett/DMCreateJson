@@ -20,7 +20,7 @@ public:
 	void Update();
 
 	MainScreen(DX::DeviceResources* DeviceResource) :deviceResources(DeviceResource){}
-	MainScreen(){}
+	MainScreen():deviceResources(nullptr){}
 private:
 	void KeyPanel();
 	void ImagePanel();

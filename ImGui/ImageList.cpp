@@ -144,6 +144,26 @@ void ImageList::SetAllImage() {
                 }
             }
         }
+        CheckSize();
+    }
+}
+
+void ImageList::CheckSize() {
+    int backSizeHeight = -1, backSizeWidth = -1;
+    bool check = false;
+    for (auto& Path : simagePath) {
+        if (backSizeHeight == -1) {
+            backSizeHeight = (int)Path.textureHeight;
+            backSizeWidth = (int)Path.textureWidth;
+        }
+        if ((int)Path.textureHeight != backSizeHeight ||(int)Path.textureWidth != backSizeWidth) {
+            sizeMismatch = true;
+            check = true;
+            break;
+        }
+    }
+    if (!check) {
+        sizeMismatch = false;
     }
 }
 
@@ -190,6 +210,7 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
             }
         }
     }
+    CheckSize();
 }
 
 void ImageList::SizeError() {
@@ -228,6 +249,12 @@ void ImageList::Update() {
         SetImageData((int)simagePath.size() - 1, OpenImageFileW());
     }
 
+    if (sizeMismatch) {
+        ImGui::Text("注意!");
+        ImGui::Text("画像のサイズが統一されていません");
+        ImGui::Text("想定外の事が起きる可能性があります");
+    }
+
     for (size_t i = 0; i < simagePath.size(); i++)
     {
         ImGui::PushID((int)i);
@@ -250,6 +277,7 @@ void ImageList::Update() {
         if (ImGui::Button("X"))
         {
             simagePath.erase(simagePath.begin() + i);
+            CheckSize();
             ImGui::PopID();
             ImGui::EndGroup();
             break;
@@ -300,4 +328,9 @@ ImVec2 ImageList::SetSize(const sImagePath& imagePath)
 
     return ImVec2(imagePath.textureWidth * Scale,imagePath.textureHeight * Scale);
 }
+
+const std::vector<sImagePath>& ImageList::GetImagePaths() {
+    return simagePath;
+}
+
 
