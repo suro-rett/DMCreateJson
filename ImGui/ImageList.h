@@ -24,6 +24,13 @@ struct sImagePath
 
 };
 
+struct sImageData
+{
+	int frameMs = 30;
+	float scale = 1.0f;
+	bool loop = true;
+};
+
 class ImageList {
 private:
 	int vkey = IDLE;
@@ -39,6 +46,8 @@ private:
 	bool PopUpSizeError = false;
 
 	bool sizeMismatch = false;
+
+	int currentImageFrame = 0;
 
 	DX::DeviceResources* deviceResources;
 	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
@@ -58,5 +67,6 @@ public:
 	void ResetAllImage();
 	void SetImageData(int Vector, std::wstring path);
 
-	void Update();
+	void ImageDataUpdate();
+	void ConfigUpdate();
 };

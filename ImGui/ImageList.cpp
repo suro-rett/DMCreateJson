@@ -240,7 +240,7 @@ void ImageList::SizeError() {
 }
 
 
-void ImageList::Update() {
+void ImageList::ImageDataUpdate() {
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
 
     if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvail().x, 100)))
@@ -331,6 +331,26 @@ ImVec2 ImageList::SetSize(const sImagePath& imagePath)
 
 const std::vector<sImagePath>& ImageList::GetImagePaths() {
     return simagePath;
+}
+
+void ImageList::ConfigUpdate() {
+    ImGui::Text("プレビュー");
+    float size = ImGui::GetContentRegionAvail().x * 0.8f;
+    ImVec2 previewSize(size, size);
+
+    ImVec2 previewpos = ImGui::GetCursorScreenPos();
+
+    ImDrawList* previewdraw = ImGui::GetWindowDrawList();
+
+    previewdraw->AddRect(previewpos, ImVec2(previewpos.x + previewSize.x, previewpos.y + previewSize.y), IM_COL32(180, 180, 180, 255));
+
+    if (currentImageFrame < simagePath.size()) {
+        float previewscale = std::min(previewSize.x / simagePath[currentImageFrame].textureWidth, previewSize.y / simagePath[currentImageFrame].textureHeight);
+
+        ImVec2 imageSize(simagePath[currentImageFrame].textureWidth * previewscale, simagePath[currentImageFrame].textureHeight * previewscale);
+        ImVec2 imagePos(previewpos.x + (previewSize.x - imageSize.x) * 0.5f, previewpos.y + (previewSize.y - imageSize.y) * 0.5f);
+        previewdraw->AddImage((ImTextureID)simagePath[currentImageFrame].texture.Get(),imagePos,ImVec2(imagePos.x + imageSize.x,imagePos.y + imageSize.y));
+    }
 }
 
 

@@ -171,7 +171,7 @@ void MainScreen::ImagePanel() {
         CenterImGuiText("此処が表示されます");
     }
     else {
-        simageList[choicesImageList].imageList.Update();
+        simageList[choicesImageList].imageList.ImageDataUpdate();
     }
 
 
@@ -188,7 +188,7 @@ void MainScreen::ConfigPanel() {
 
     }
     else {
-        ImGui::Text("プレビュー");
+        simageList[choicesImageList].imageList.ConfigUpdate();
     }
 
     ImGui::EndChild();
