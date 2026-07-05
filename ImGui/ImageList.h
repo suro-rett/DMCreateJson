@@ -8,6 +8,7 @@
 #include <d3d11.h>
 #include "DeviceResources.h"
 #include "imgui.h"
+#include "StepTimer.h"
 
 using Microsoft::WRL::ComPtr;
 #define MAXHEIGHT 300.0f
@@ -37,25 +38,28 @@ private:
 
 	std::vector<sImagePath> simagePath;
 
-	float scale = 1.0f;
+	sImageData simageData;
 
-	float interval = 100;
+	bool PopUpSizeError = false;//画像リストで新しく選んだ画像が奇数サイズじゃないかチェック
 
-	bool loop = true;
+	bool sizeMismatch = false;	//画像リストの各画像サイズチェック
 
-	bool PopUpSizeError = false;
-
-	bool sizeMismatch = false;
-
-	int currentImageFrame = 0;
+	int currentImageFrame = 0;	//プレビュー画面で流すフレーム
+	int lastTime = 0;
 
 	DX::DeviceResources* deviceResources;
+	DX::StepTimer* m_timer;
+
 	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
 	ImVec2 SetSize(const sImagePath& imagePath);
 	void SizeError();
 	void CheckSize();
+
+	void ChangeCurrentFrame();
+
+	
 public:
-	ImageList(DX::DeviceResources* DeviceResources):deviceResources(DeviceResources){}
+	ImageList(DX::DeviceResources* DeviceResources, DX::StepTimer* time):deviceResources(DeviceResources), m_timer(time){}
 	~ImageList(){}
 
 	std::string GetKey();
@@ -69,4 +73,5 @@ public:
 
 	void ImageDataUpdate();
 	void ConfigUpdate();
+	void SetLoop(bool aloop) { simageData.loop = aloop; }
 };

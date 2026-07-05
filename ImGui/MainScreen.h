@@ -8,8 +8,8 @@ struct sImageList
 	bool changeButton = false;
 	ImageList  imageList;
 
-	sImageList(DX::DeviceResources* deviceResources)
-		: imageList(deviceResources)
+	sImageList(DX::DeviceResources* deviceResources, DX::StepTimer* time)
+		: imageList(deviceResources,time)
 	{
 	}
 };
@@ -19,7 +19,7 @@ class MainScreen
 public:
 	void Update();
 
-	MainScreen(DX::DeviceResources* DeviceResource) :deviceResources(DeviceResource){}
+	MainScreen(DX::DeviceResources* DeviceResource, DX::StepTimer* time) :deviceResources(DeviceResource),m_time(time){}
 	MainScreen():deviceResources(nullptr){}
 private:
 	void KeyPanel();
@@ -28,7 +28,7 @@ private:
 
 
 	DX::DeviceResources* deviceResources;
-
+	DX::StepTimer* m_time;
 	std::vector<sImageList> simageList;
 
 	int choicesImageList = -1;

@@ -1,4 +1,4 @@
-//
+﻿//
 // StepTimer.h - A simple timer that provides elapsed time information
 //
 

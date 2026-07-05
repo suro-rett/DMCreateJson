@@ -44,7 +44,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_deviceResources->CreateWindowSizeDependentResources();
     CreateWindowSizeDependentResources();
 
-    mainScreen = MainScreen(m_deviceResources.get());
+    mainScreen = MainScreen(m_deviceResources.get(), &m_timer);
 
     // TODO: Change the timer settings if you want something other than the default variable timestep mode.
     // e.g. for 60 FPS fixed timestep update logic, call:
@@ -73,7 +73,7 @@ void Game::Initialize(HWND window, int width, int height)
 
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // ドッキングを有効化
 
-
+    io.IniFilename = "initialize\\imgui.ini";
 
 
 
@@ -82,7 +82,7 @@ void Game::Initialize(HWND window, int width, int height)
     //  DirectX11用の初期化
     ID3D11Device* device = m_deviceResources->GetD3DDevice();
     ID3D11DeviceContext* context = m_deviceResources->GetD3DDeviceContext();
-    ImGui_ImplDX11_Init(device, context);
+    ImGui_ImplDX11_Init(device, context);  
 }
 
 #pragma region Frame Update

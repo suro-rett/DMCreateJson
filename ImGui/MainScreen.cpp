@@ -50,7 +50,7 @@ void MainScreen::KeyPanel() {
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
     if (ImGui::Button("+", ImVec2(width , 100)))
     {
-        simageList.push_back({deviceResources});
+        simageList.push_back({deviceResources,m_time});
     }
     ImGui::PopStyleColor();
     for (size_t i = 0; i < simageList.size(); i++)
@@ -132,6 +132,7 @@ void MainScreen::KeyPanel() {
                 {
                     simageList[i].imageList.SetKey(IDLE);
                     simageList[i].changeButton = false;
+                    simageList[i].imageList.SetLoop(true);
                 }
 
                 if (simageList[i].changeButton) {
@@ -139,6 +140,7 @@ void MainScreen::KeyPanel() {
                         if (IsKeyReleased(j)) {
                             simageList[i].imageList.SetKey(j);
                             simageList[i].changeButton = false;
+                            simageList[i].imageList.SetLoop(false);
                             break;
                         }
                     }

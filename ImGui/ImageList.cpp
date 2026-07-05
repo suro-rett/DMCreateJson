@@ -335,6 +335,8 @@ const std::vector<sImagePath>& ImageList::GetImagePaths() {
 
 void ImageList::ConfigUpdate() {
     ImGui::Text("プレビュー");
+    
+
     float size = ImGui::GetContentRegionAvail().x * 0.8f;
     ImVec2 previewSize(size, size);
 
@@ -354,3 +356,6 @@ void ImageList::ConfigUpdate() {
 }
 
 
+void ChangeCurrentFrame() {
+
+}
