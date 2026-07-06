@@ -144,6 +144,8 @@ void ImageList::SetAllImage() {
                 }
             }
         }
+        lastTime = (float)m_timer->GetTotalSeconds();
+        currentImageFrame = 0;
         CheckSize();
     }
 }
@@ -346,6 +348,8 @@ void ImageList::ConfigUpdate() {
 
     previewdraw->AddRect(previewpos, ImVec2(previewpos.x + previewSize.x, previewpos.y + previewSize.y), IM_COL32(180, 180, 180, 255));
 
+    ChangeCurrentFrame();
+    
     if (currentImageFrame < simagePath.size()) {
         float previewscale = std::min(previewSize.x / simagePath[currentImageFrame].textureWidth, previewSize.y / simagePath[currentImageFrame].textureHeight);
 
@@ -356,6 +360,39 @@ void ImageList::ConfigUpdate() {
 }
 
 
-void ChangeCurrentFrame() {
-
+void ImageList::ChangeCurrentFrame() {
+    if ((float)m_timer->GetTotalSeconds() - lastTime >= (simageData.frameMs/1000.0) && CheckImage())
+    {
+        lastTime = (float)m_timer->GetTotalSeconds();
+        setCurrentFrame();
+    }
 }
+
+bool ImageList::CheckImage() {
+    for (auto& Path : simagePath) {
+        if (Path.texture != nullptr) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ImageList::setCurrentFrame() {
+    int iniFrame = currentImageFrame;
+    for (int i = 0; i<simagePath.size(); i++) {
+        if (iniFrame + 1 >= simagePath.size()) {
+            iniFrame = 0;
+        }
+        else {
+            iniFrame++;
+        }
+
+        if (simagePath[iniFrame].imagePaths != L"NoData") {
+            currentImageFrame = iniFrame;
+            break;
+        }
+    }
+}
+
+
+

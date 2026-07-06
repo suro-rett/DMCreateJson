@@ -27,7 +27,7 @@ struct sImagePath
 
 struct sImageData
 {
-	int frameMs = 30;
+	int frameMs = 45;
 	float scale = 1.0f;
 	bool loop = true;
 };
@@ -37,27 +37,26 @@ private:
 	int vkey = IDLE;
 
 	std::vector<sImagePath> simagePath;
-
 	sImageData simageData;
-
-	bool PopUpSizeError = false;//画像リストで新しく選んだ画像が奇数サイズじゃないかチェック
-
-	bool sizeMismatch = false;	//画像リストの各画像サイズチェック
-
-	int currentImageFrame = 0;	//プレビュー画面で流すフレーム
-	int lastTime = 0;
 
 	DX::DeviceResources* deviceResources;
 	DX::StepTimer* m_timer;
+#pragma region イメージデータ(真ん中)
+	bool PopUpSizeError = false;//画像リストで新しく選んだ画像が奇数サイズじゃないかチェック
+	bool sizeMismatch = false;	//画像リストの各画像サイズチェック
 
 	bool GetTextureSize(ID3D11ShaderResourceView* srv, UINT& width, UINT& height);
 	ImVec2 SetSize(const sImagePath& imagePath);
 	void SizeError();
 	void CheckSize();
-
+#pragma endregion
+#pragma region プレビュー
+	int currentImageFrame = 0;	//プレビュー画面で流すフレーム
+	float lastTime = 0;
 	void ChangeCurrentFrame();
-
-	
+	bool CheckImage();
+	void setCurrentFrame();
+#pragma endregion
 public:
 	ImageList(DX::DeviceResources* DeviceResources, DX::StepTimer* time):deviceResources(DeviceResources), m_timer(time){}
 	~ImageList(){}
