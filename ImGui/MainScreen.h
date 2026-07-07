@@ -20,7 +20,7 @@ public:
 	void Update();
 
 	MainScreen(DX::DeviceResources* DeviceResource, DX::StepTimer* time) :deviceResources(DeviceResource),m_time(time){}
-	MainScreen():deviceResources(nullptr){}
+	MainScreen():deviceResources(nullptr), m_time(nullptr) {}
 private:
 	void KeyPanel();
 	void ImagePanel();
@@ -32,7 +32,7 @@ private:
 	std::vector<sImageList> simageList;
 
 	int choicesImageList = -1;
-	//bool choiceNormal = false;
+	void ChangeKey(size_t i);
 
 	//ImGui::Textにて表示されるtextをウィンドウの中心に表示する
 	void CenterImGuiText(const char* text);

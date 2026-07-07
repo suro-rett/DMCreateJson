@@ -261,7 +261,12 @@ void ImageList::ImageDataUpdate() {
     {
         ImGui::PushID((int)i);
 
-        if (!simagePath[i].texture) {
+        if (!simagePath[i].texture && simagePath[i].imagePaths != L"NoData") {
+            if (ImGui::Button("画像読み込み失敗", ImVec2(ImGui::GetContentRegionAvail().x * 0.8f, 100))) {
+                SetImageData((int)i, OpenImageFileW());
+            }
+        }
+        else if (!simagePath[i].texture) {
             if (ImGui::Button("NoData", ImVec2(ImGui::GetContentRegionAvail().x * 0.8f, 100))) {
                 SetImageData((int)i, OpenImageFileW());
             }
@@ -342,11 +347,13 @@ void ImageList::ConfigUpdate() {
     float size = ImGui::GetContentRegionAvail().x * 0.8f;
     ImVec2 previewSize(size, size);
 
-    ImVec2 previewpos = ImGui::GetCursorScreenPos();
+    ImVec2 previewPos = ImGui::GetCursorScreenPos();
 
     ImDrawList* previewdraw = ImGui::GetWindowDrawList();
 
-    previewdraw->AddRect(previewpos, ImVec2(previewpos.x + previewSize.x, previewpos.y + previewSize.y), IM_COL32(180, 180, 180, 255));
+    ImGui::InvisibleButton("PreviewArea", previewSize); //レイアウト領域確保
+
+    previewdraw->AddRect(previewPos, ImVec2(previewPos.x + previewSize.x, previewPos.y + previewSize.y), IM_COL32(180, 180, 180, 255));
 
     ChangeCurrentFrame();
     
@@ -354,9 +361,11 @@ void ImageList::ConfigUpdate() {
         float previewscale = std::min(previewSize.x / simagePath[currentImageFrame].textureWidth, previewSize.y / simagePath[currentImageFrame].textureHeight);
 
         ImVec2 imageSize(simagePath[currentImageFrame].textureWidth * previewscale, simagePath[currentImageFrame].textureHeight * previewscale);
-        ImVec2 imagePos(previewpos.x + (previewSize.x - imageSize.x) * 0.5f, previewpos.y + (previewSize.y - imageSize.y) * 0.5f);
+        ImVec2 imagePos(previewPos.x + (previewSize.x - imageSize.x) * 0.5f, previewPos.y + (previewSize.y - imageSize.y) * 0.5f);
         previewdraw->AddImage((ImTextureID)simagePath[currentImageFrame].texture.Get(),imagePos,ImVec2(imagePos.x + imageSize.x,imagePos.y + imageSize.y));
     }
+
+    ScalePreview();
 }
 
 
@@ -387,9 +396,83 @@ void ImageList::setCurrentFrame() {
             iniFrame++;
         }
 
-        if (simagePath[iniFrame].imagePaths != L"NoData") {
+        if (simagePath[iniFrame].texture != nullptr) {
             currentImageFrame = iniFrame;
             break;
+        }
+    }
+}
+
+void ImageList::ScalePreview() {
+    if (ImGui::Button("スケールプレビュー", ImVec2(ImGui::GetContentRegionAvail().x * 0.8f, 50))) {
+        if(CheckImage())scalePreviewSetUp = true;
+    }
+
+    if (scalePreviewSetUp) {
+        ImGui::SetNextWindowSize(ImVec2(400, 220));
+        ImGui::OpenPopup("スケールプレビューSetUp");
+        if (ImGui::BeginPopupModal("スケールプレビューSetUp", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("次に進むと実際のサイズを確認する事が出来ます");
+            ImGui::Text("Escapeキーを押すと戻ることが出来ます");
+            ImGui::Text("全画面での表示をお勧めします");
+            ImGui::Text("");
+            float buttonWidth = 100.0f;
+            float spacing = ImGui::GetStyle().ItemSpacing.x;
+
+            float totalWidth = buttonWidth * 2 + spacing;
+
+            float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
+
+            if (ImGui::Button("戻る(ESC)", ImVec2(buttonWidth, 50)))
+            {
+                scalePreviewSetUp = false;
+            }
+            if (IsKeyReleased(VK_ESCAPE)) {
+                scalePreviewSetUp = false;
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("OK(Enter)", ImVec2(buttonWidth, 50)))
+            {
+                scalePreviewSetUp = false;
+                scalePreview      = true;
+            }
+            if (IsKeyReleased(VK_RETURN)) {
+                scalePreviewSetUp = false;
+                scalePreview      = true;
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+
+    if (scalePreview) {
+        ImGui::OpenPopup("スケールプレビュー");
+        if (ImGui::BeginPopupModal(
+            "スケールプレビュー",
+            nullptr,
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoScrollbar))
+        {
+            float width = static_cast<float>(simagePath[currentImageFrame].textureWidth) * simageData.scale;
+            float height = static_cast<float>(simagePath[currentImageFrame].textureHeight) * simageData.scale;
+
+            // ウィンドウサイズを画像サイズに合わせる
+            ImGui::SetWindowSize(ImVec2(width, height));
+
+            ImGui::Image((ImTextureID)simagePath[currentImageFrame].texture.Get(),ImVec2(width, height));
+
+            if (IsKeyReleased(VK_ESCAPE))
+            {
+                ImGui::CloseCurrentPopup();
+                scalePreview = false;
+            }
+
+            ImGui::EndPopup();
         }
     }
 }

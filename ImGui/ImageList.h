@@ -27,8 +27,8 @@ struct sImagePath
 
 struct sImageData
 {
-	int frameMs = 45;
-	float scale = 1.0f;
+	int frameMs = 75;
+	float scale = 0.3f;
 	bool loop = true;
 };
 
@@ -57,6 +57,12 @@ private:
 	bool CheckImage();
 	void setCurrentFrame();
 #pragma endregion
+#pragma region スケールプレビュー
+	void ScalePreview();
+	bool scalePreviewSetUp = false;
+	bool scalePreview = false;
+#pragma endregion
+
 public:
 	ImageList(DX::DeviceResources* DeviceResources, DX::StepTimer* time):deviceResources(DeviceResources), m_timer(time){}
 	~ImageList(){}
