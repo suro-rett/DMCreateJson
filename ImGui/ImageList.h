@@ -28,7 +28,7 @@ struct sImagePath
 struct sImageData
 {
 	int frameMs = 75;
-	float scale = 0.3f;
+	float scale = 1.0f;
 	bool loop = true;
 };
 

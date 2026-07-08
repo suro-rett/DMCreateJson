@@ -456,13 +456,19 @@ void ImageList::ScalePreview() {
             "スケールプレビュー",
             nullptr,
             ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoScrollbar))
+            ImGuiWindowFlags_NoScrollbar
+            ))
         {
             float width = static_cast<float>(simagePath[currentImageFrame].textureWidth) * simageData.scale;
             float height = static_cast<float>(simagePath[currentImageFrame].textureHeight) * simageData.scale;
+            ImVec2 avail = ImGui::GetContentRegionAvail();
 
             // ウィンドウサイズを画像サイズに合わせる
-            ImGui::SetWindowSize(ImVec2(width, height));
+            ImVec2 padding = ImGui::GetStyle().WindowPadding;
+
+            float title = ImGui::GetFrameHeight();
+
+            ImGui::SetWindowSize(ImVec2(width + padding.x * 2,height + padding.y * 2 + title));
 
             ImGui::Image((ImTextureID)simagePath[currentImageFrame].texture.Get(),ImVec2(width, height));
 
