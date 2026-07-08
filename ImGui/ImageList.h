@@ -39,8 +39,11 @@ private:
 	std::vector<sImagePath> simagePath;
 	sImageData simageData;
 
+#pragma region directXデータ
 	DX::DeviceResources* deviceResources;
 	DX::StepTimer* m_timer;
+#pragma endregion
+
 #pragma region イメージデータ(真ん中)
 	bool PopUpSizeError = false;//画像リストで新しく選んだ画像が奇数サイズじゃないかチェック
 	bool sizeMismatch = false;	//画像リストの各画像サイズチェック
@@ -50,6 +53,7 @@ private:
 	void SizeError();
 	void CheckSize();
 #pragma endregion
+#pragma region 設定(右)
 #pragma region プレビュー
 	int currentImageFrame = 0;	//プレビュー画面で流すフレーム
 	float lastTime = 0;
@@ -62,12 +66,14 @@ private:
 	bool scalePreviewSetUp = false;
 	bool scalePreview = false;
 #pragma endregion
-
+#pragma region ステータス変更関数
 	void SetFrameMS();
 	void SetScale();
 	void SetLoopButton();
+#pragma endregion
 
-	int e = 0;
+#pragma endregion
+
 public:
 	ImageList(DX::DeviceResources* DeviceResources, DX::StepTimer* time):deviceResources(DeviceResources), m_timer(time){}
 	~ImageList(){}
@@ -84,4 +90,8 @@ public:
 	void ImageDataUpdate();
 	void ConfigUpdate();
 	void SetLoop(bool aloop) { simageData.loop = aloop; }
+	std::vector<sImagePath> GetImagePath() { return simagePath; }
+	sImageData GetImageData() { return simageData; }
+
+	void SetJsonImage(std::vector<sImagePath> imagePath, sImageData imageData) { simagePath = imagePath; simageData = imageData; }
 };

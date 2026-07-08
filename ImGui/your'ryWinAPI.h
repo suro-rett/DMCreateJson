@@ -17,7 +17,8 @@ std::wstring StringToWString(const std::string& str);
 std::string WStringToString(const std::wstring& wstr);
 //第1引数stringの後ろから第2引数番目から第3引数分の文字取得　API使ってないため移行するかも
 std::string substrBack(std::string str, size_t pos, size_t len);
-
+//第1引数wstringの後ろから第2引数番目から第3引数分の文字取得　API使ってないため移行するかも
+std::wstring subwstrBack(std::wstring str, size_t pos, size_t len);
 
 void PrintMemoryUsage();
 //エクスプローラーを開きイメージ画像を選択でき、絶対パスを返す
@@ -25,6 +26,7 @@ std::string OpenImageFileA();
 
 std::wstring OpenImageFileW();
 
+std::wstring OpenJsonFileW();
 //受けっとったファイルパスから実行ファイルからの相対パス取得 動作不安定？
 std::string GetRelativePath(const std::string& targetPath);
 

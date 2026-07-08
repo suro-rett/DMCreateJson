@@ -142,8 +142,17 @@ void ImageList::SetAllImage() {
                 {
                     OutputDebugStringA("Load Failed\n");
                 }
+                if (SUCCEEDED(hr)) {
+                    GetTextureSize(Path.texture.Get(), Path.textureWidth, Path.textureHeight);
+                    if (Path.textureWidth % 2 == 1 || Path.textureHeight % 2 == 1) {
+                        Path.texture.Reset();
+                        Path.imagePaths = L"NoData";
+                        PopUpSizeError = true;
+                    }
+                }
             }
         }
+
         lastTime = (float)m_timer->GetTotalSeconds();
         currentImageFrame = 0;
         CheckSize();

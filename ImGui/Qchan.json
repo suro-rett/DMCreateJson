@@ -1,0 +1,97 @@
+{
+  "imageData": [
+
+    {
+      "paths": [
+        "images/Qchan_IDLE/Qchan_IDLE0_1.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_2.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_3.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_4.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_5.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_6.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_7.png",
+        "images/Qchan_IDLE/Qchan_IDLE0_8.png"
+      ],
+      "type": 256,
+      "frameMs": 47,
+      "scale": 0.3,
+      "loop": true
+    },
+    {
+      "paths": [
+        "images/Qchan_IDLE/Qchan_IDLE1_1.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_2.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_3.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_4.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_5.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_6.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_7.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_8.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_9.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_10.png",
+        "images/Qchan_IDLE/Qchan_IDLE1_11.png"
+      ],
+      "type": 256,
+      "frameMs": 45,
+      "scale": 0.3,
+      "loop": true
+    },
+    {
+      "paths": [
+        "images/Qchan_IDLE/Qchan_IDLE2_1.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_2.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_3.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_4.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_5.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_6.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_7.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_8.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_9.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_10.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_11.png",
+        "images/Qchan_IDLE/Qchan_IDLE2_12.png"
+      ],
+      "type": 256,
+      "frameMs": 45,
+      "scale": 0.3,
+      "loop": true
+    },
+    {
+      "paths": [
+        "images/Qchan_IDLE/Qchan_IDLE3_1.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_2.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_3.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_4.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_5.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_6.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_7.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_8.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_9.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_10.png",
+        "images/Qchan_IDLE/Qchan_IDLE3_11.png"
+      ],
+      "type": 256,
+      "frameMs": 45,
+      "scale": 0.3,
+      "loop": true
+    },
+    {
+      "paths": [
+        "images/Qchan_RETURN/QchanRETURN0_1.png",
+        "images/Qchan_RETURN/QchanRETURN0_2.png",
+        "images/Qchan_RETURN/QchanRETURN0_3.png",
+        "images/Qchan_RETURN/QchanRETURN0_4.png",
+        "images/Qchan_RETURN/QchanRETURN0_5.png",
+        "images/Qchan_RETURN/QchanRETURN0_6.png",
+        "images/Qchan_RETURN/QchanRETURN0_7.png",
+        "images/Qchan_RETURN/QchanRETURN0_8.png",
+        "images/Qchan_RETURN/QchanRETURN0_9.png",
+        "images/Qchan_RETURN/QchanRETURN0_10.png"
+      ],
+      "type": 13,
+      "frameMs": 50,
+      "scale": 0.3,
+      "loop": false
+    }
+  ]
+}

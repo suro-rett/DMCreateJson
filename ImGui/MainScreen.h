@@ -26,6 +26,11 @@ private:
 	void ImagePanel();
 	void ConfigPanel();
 
+#pragma region メニュー
+	void MenuPanel();
+	void OpenJson();
+#pragma endregion
+
 
 	DX::DeviceResources* deviceResources;
 	DX::StepTimer* m_time;

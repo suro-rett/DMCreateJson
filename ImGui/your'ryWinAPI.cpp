@@ -65,6 +65,12 @@ std::string substrBack(std::string str, size_t pos, size_t len) {
     return str.substr(strLen - pos, len);
 }
 
+std::wstring subwstrBack(std::wstring str, size_t pos, size_t len) {
+    const size_t strLen = str.length();
+
+    return str.substr(strLen - pos, len);
+}
+
 void PrintMemoryUsage() {
     //HANDLE hProcess = GetCurrentProcess();
     //PROCESS_MEMORY_COUNTERS pmc;
@@ -121,6 +127,36 @@ std::wstring OpenImageFileW()
 
     ofn.lpstrFilter =
         L"Image Files\0*.png;*.gif;*.jpg;*.jpeg;*.bmp\0"
+        L"All Files\0*.*\0";
+
+    ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+    if (GetOpenFileNameW(&ofn))
+    {
+        m_wlastFolder = std::filesystem::path(fileName).parent_path().wstring();
+        return fileName;
+    }
+
+    return L"";
+}
+
+std::wstring OpenJsonFileW()
+{
+    wchar_t fileName[MAX_PATH] = {};
+
+    OPENFILENAMEW ofn = {};
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = nullptr;
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+
+    std::wstring initialDir = StringToWString(GetRelativePath());
+
+    ofn.lpstrInitialDir =
+        m_wlastFolder.empty() ? initialDir.c_str() : m_wlastFolder.c_str();
+
+    ofn.lpstrFilter =
+        L"Json Files\0*.json;\0"
         L"All Files\0*.*\0";
 
     ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;

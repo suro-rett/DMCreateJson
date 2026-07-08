@@ -8,6 +8,10 @@
 #include "imgui_impl_dx11.h"
 #include <Vector>
 #include "your'ryWinAPI.h"
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 void MainScreen::Update() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -19,11 +23,12 @@ void MainScreen::Update() {
         ImGuiWindowFlags_NoTitleBar |
         ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_MenuBar;
 
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.3f, 0.4f, 0.4f, 1.0f));
     ImGui::Begin("MainWindow", nullptr, flags);
-
+    MenuPanel();
     if (ImGui::BeginTable("MainTable", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV))
     {
         KeyPanel();
@@ -73,6 +78,7 @@ void MainScreen::KeyPanel() {
         ImGui::PopStyleColor();
         
 
+
         ImGui::SameLine();
         ImGui::BeginGroup();
 
@@ -84,6 +90,10 @@ void MainScreen::KeyPanel() {
                 if (choicesImageList == i) {
                     choicesImageList = -1;
                 }
+                else if (choicesImageList > i) {
+                    choicesImageList -= 1;
+                }
+           
                 simageList.erase(simageList.begin() + i);
                 ImGui::PopID();
                 ImGui::EndGroup();
@@ -173,7 +183,7 @@ void MainScreen::ImagePanel() {
     ImGui::Text("画像リスト");
 
  
-    if (choicesImageList == -1) {
+    if (choicesImageList <= -1) {
         CenterImGuiText("←　キー・ボタンのボタンを");
         CenterImGuiText("選択すると");
         CenterImGuiText("此処が表示されます");
@@ -212,4 +222,88 @@ void MainScreen::CenterImGuiText(const char* text) {
     );
 
     ImGui::Text("%s", text);
+}
+
+void MainScreen::MenuPanel() {
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("ファイル")) {
+            if (ImGui::MenuItem("開く", "Ctrl+O")) {
+                OpenJson();
+            }
+            if (ImGui::MenuItem("保存", "Ctrl+S")) { 
+            
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+}
+
+void MainScreen::OpenJson() {
+    std::wstring FileName = OpenJsonFileW();
+    if (FileName != L"") {
+        if (subwstrBack(FileName, 4, 4) == L"json") {
+            std::ifstream file(FileName);
+            if (!file.is_open())
+            {
+                std::wstring message = L"jsonファイル読み込み失敗。 ファイル名：" + FileName + L"\n\n重要ファイルが見つからないため、ソフトを停止します\n";
+                MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+                return;
+            }
+            json j;
+
+            file >> j;
+
+            bool File = true;
+
+            if (!j.contains("imageData"))
+            {
+                MessageBoxW(
+                    nullptr,
+                    L"このアプリ用のJSONファイルではありません。",
+                    L"エラー",
+                    MB_OK | MB_ICONERROR);
+
+                return;
+            }
+
+            for (const auto& img : j["imageData"])
+            {
+                if (!img.contains("type") ||
+                    !img.contains("paths") ||
+                    !img.contains("frameMs") ||
+                    !img.contains("scale") ||
+                    !img.contains("loop"))
+                {
+                    MessageBoxW(
+                        nullptr,
+                        L"JSONの形式が正しくありません。",
+                        L"エラー",
+                        MB_OK | MB_ICONERROR);
+                    File = false;
+                    return;
+                }
+            }
+
+            simageList.clear();
+            choicesImageList = -1;
+
+            
+            //imageData.emplace_back();
+            for (const auto& img : j["imageData"])
+            {
+                sImageData imageData{img["frameMs"].get<int>(),img["scale"].get<float>(),img["loop"].get<bool>() };
+
+                std::vector<sImagePath> imagePath;
+                for (int i = 0; i < img["paths"].get<std::vector<std::string>>().size(); i++) {
+                    imagePath.emplace_back();
+                    imagePath.back().imagePaths = StringToWString(img["paths"].get<std::vector<std::string>>()[i]);
+                }
+
+                simageList.push_back({ deviceResources,m_time });
+                simageList.back().imageList.SetKey(img["type"].get<int>());
+                simageList.back().imageList.SetJsonImage(imagePath, imageData);
+            }
+        }
+    }
 }
