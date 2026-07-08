@@ -150,9 +150,11 @@ void MainScreen::ChangeKey(size_t i) {
             if (simageList[i].changeButton) {
                 for (int j = 0; j < 166; j++) {//166なのはVkで0xA1以降はあまり意味がないため
                     if (IsKeyReleased(j)) {
+                        if (simageList[i].imageList.GetKey() == "IDLE") {
+                            simageList[i].imageList.SetLoop(false);
+                        }
                         simageList[i].imageList.SetKey(j);
                         simageList[i].changeButton = false;
-                        simageList[i].imageList.SetLoop(false);
                         break;
                     }
                 }

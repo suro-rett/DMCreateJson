@@ -63,6 +63,11 @@ private:
 	bool scalePreview = false;
 #pragma endregion
 
+	void SetFrameMS();
+	void SetScale();
+	void SetLoopButton();
+
+	int e = 0;
 public:
 	ImageList(DX::DeviceResources* DeviceResources, DX::StepTimer* time):deviceResources(DeviceResources), m_timer(time){}
 	~ImageList(){}

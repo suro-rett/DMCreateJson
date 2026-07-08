@@ -366,6 +366,10 @@ void ImageList::ConfigUpdate() {
     }
 
     ScalePreview();
+
+    SetFrameMS();
+    SetScale();
+    SetLoopButton();
 }
 
 
@@ -483,5 +487,32 @@ void ImageList::ScalePreview() {
     }
 }
 
+void ImageList::SetFrameMS() {
+    ImGui::Text("");
 
+    ImGui::Text("FrameMS");
+    ImGui::SliderInt("##NextFrameMsSlider", &simageData.frameMs, 1, 300);
+    ImGui::SameLine();
+    ImGui::InputInt("##NextFrameMsInput", &simageData.frameMs, 1, 300);
+    simageData.frameMs = std::clamp(simageData.frameMs, 1, 300);
+}
 
+void ImageList::SetScale() {
+    ImGui::Text("");
+    ImGui::Text("Scale　※スケールプレビューを元に調整してください");
+    ImGui::SliderFloat("##ScaleSlider", &simageData.scale, 0.01f, 2.00f, "%.2f");
+    ImGui::SameLine();
+    ImGui::InputFloat("##ScaleInput", &simageData.scale, 0.01f, 2.00f, "%.2f");
+    simageData.scale = std::clamp(simageData.scale, 0.1f, 2.0f);
+}
+
+void ImageList::SetLoopButton() {
+    ImGui::Text("");
+    ImGui::Text("ループ");
+    if (GetKey() == "IDLE") {
+        ImGui::Text("※IDLEはループON固定です");
+    }
+    if (ImGui::RadioButton("ON", simageData.loop))if (GetKey() != "IDLE")simageData.loop = true;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("OFF", !simageData.loop))if (GetKey() != "IDLE")simageData.loop = false;
+}
