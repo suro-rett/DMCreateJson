@@ -399,6 +399,15 @@ bool ImageList::CheckImage() {
     return false;
 }
 
+bool ImageList::CheckImagePath() {
+    for (auto& Path : simagePath) {
+        if (Path.imagePaths != L"NoData") {
+            return true;
+        }
+    }
+    return false;
+}
+
 void ImageList::setCurrentFrame() {
     int iniFrame = currentImageFrame;
     for (int i = 0; i<simagePath.size(); i++) {

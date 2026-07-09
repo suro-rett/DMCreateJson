@@ -239,3 +239,36 @@ bool SaveFileDialog(const char* defaultName,const char* extension, const char* I
 
     return false;
 }
+
+std::string SaveFileDialogString(const char* defaultName, const char* extension, const char* InitialDir) {
+    char fileName[MAX_PATH] = {};
+
+    strcpy_s(fileName, defaultName);
+
+    OPENFILENAMEA ofn = {};
+    ofn.lStructSize = sizeof(ofn);
+    ofn.lpstrFile = fileName;
+    ofn.nMaxFile = MAX_PATH;
+    if (InitialDir != nullptr) {
+        ofn.lpstrInitialDir = InitialDir;
+    }
+
+    ofn.lpstrDefExt = extension;
+    ofn.lpstrFilter =
+        "JSON Files\0*.json\0"
+        "All Files\0*.*\0";
+
+    ofn.Flags =
+        OFN_PATHMUSTEXIST |
+        OFN_OVERWRITEPROMPT;
+
+    if (GetSaveFileNameA(&ofn))
+    {
+        std::ofstream ofs(fileName);
+
+        std::string a = fileName;
+        return a;
+    }
+
+    return "";
+}

@@ -58,8 +58,8 @@ private:
 	int currentImageFrame = 0;	//プレビュー画面で流すフレーム
 	float lastTime = 0;
 	void ChangeCurrentFrame();
-	bool CheckImage();
 	void setCurrentFrame();
+	bool CheckImage();
 #pragma endregion
 #pragma region スケールプレビュー
 	void ScalePreview();
@@ -79,6 +79,7 @@ public:
 	~ImageList(){}
 
 	std::string GetKey();
+	int GetIntKey() { return vkey; }
 	void SetKey(int setKey);
 	bool IsNormal() { return GetKey() != "不明"; }
 
@@ -90,8 +91,11 @@ public:
 	void ImageDataUpdate();
 	void ConfigUpdate();
 	void SetLoop(bool aloop) { simageData.loop = aloop; }
+
 	std::vector<sImagePath> GetImagePath() { return simagePath; }
 	sImageData GetImageData() { return simageData; }
+	
+	bool CheckImagePath();
 
 	void SetJsonImage(std::vector<sImagePath> imagePath, sImageData imageData) { simagePath = imagePath; simageData = imageData; }
 };

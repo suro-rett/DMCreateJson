@@ -23,7 +23,6 @@ std::wstring subwstrBack(std::wstring str, size_t pos, size_t len);
 void PrintMemoryUsage();
 //エクスプローラーを開きイメージ画像を選択でき、絶対パスを返す
 std::string OpenImageFileA();
-
 std::wstring OpenImageFileW();
 
 std::wstring OpenJsonFileW();
@@ -35,3 +34,5 @@ std::string GetRelativePath();
 //エクスプローラーを開き引数の通りにファイルを新規・上書き保存する　
 // 第一引数:ファイルの初期名　第二引数:保存形式(拡張子)　第三引数:初期表示のディレクトリ場所
 bool SaveFileDialog(const char* defaultName, const char* extension, const char* InitialDir);
+
+std::string SaveFileDialogString(const char* defaultName, const char* extension, const char* InitialDir);

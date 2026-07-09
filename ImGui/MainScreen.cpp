@@ -231,7 +231,7 @@ void MainScreen::MenuPanel() {
                 OpenJson();
             }
             if (ImGui::MenuItem("保存", "Ctrl+S")) { 
-            
+                SaveJson();
             }
             ImGui::EndMenu();
         }
@@ -305,5 +305,59 @@ void MainScreen::OpenJson() {
                 simageList.back().imageList.SetJsonImage(imagePath, imageData);
             }
         }
+    }
+}
+
+void MainScreen::SaveJson() {
+    std::string fileName;
+    if (simageList.size() != 0) {
+        bool a = false;
+        for (auto& List : simageList) {
+            if (!a) {
+                a = List.imageList.CheckImagePath();
+            }
+        }
+        if (a) {
+            fileName = SaveFileDialogString("新規作成", "json", GetRelativePath().c_str());
+            if (fileName == "") {
+                return;
+            }
+        }
+        else {
+            std::wstring message = L"jsonファイル保存失敗。 \n\nデータが無いため保存できません\n";
+            MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+            return;
+        }
+    }
+
+    nlohmann::json j;
+
+    j["imageData"] = nlohmann::json::array();
+
+    for (auto& List : simageList) {
+        if (List.imageList.CheckImagePath()) {
+            std::vector<std::string> Path;
+            for (auto& Image : List.imageList.GetImagePath()) {
+                if (Image.imagePaths != L"NoData") {
+                    Path.emplace_back(WStringToString(Image.imagePaths));
+                }
+            }
+            nlohmann::json item;
+
+            item["paths"] = Path;
+            item["type"] = List.imageList.GetIntKey();
+            item["frameMs"] = List.imageList.GetImageData().frameMs;
+            item["scale"] = std::round(List.imageList.GetImageData().scale * 1000.0f) / 1000.0f;
+            item["loop"] = List.imageList.GetImageData().loop;
+
+            j["imageData"].push_back(item);
+        }
+    }
+
+    std::ofstream ofs(fileName);
+
+    if (ofs)
+    {
+        ofs << std::setw(2) << j;
     }
 }

@@ -29,6 +29,7 @@ private:
 #pragma region メニュー
 	void MenuPanel();
 	void OpenJson();
+	void SaveJson();
 #pragma endregion
 
 

@@ -1,0 +1,36 @@
+{
+  "imageData": [
+    {
+      "frameMs": 116,
+      "loop": true,
+      "paths": [
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_01.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_02.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_03.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_04.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_05.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_06.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_07.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_6_08.png"
+      ],
+      "scale": 0.30000001192092896,
+      "type": 256
+    },
+    {
+      "frameMs": 28,
+      "loop": false,
+      "paths": [
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_01.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_02.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_03.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_04.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_05.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_06.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_07.png",
+        "C:\\Users\\ydauser01\\Documents\\self-made-in-C\\DM_CreateJson\\ImGui\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_5_08.png"
+      ],
+      "scale": 0.20999999344348907,
+      "type": 65
+    }
+  ]
+}
