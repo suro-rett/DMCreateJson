@@ -86,19 +86,16 @@ void MainScreen::KeyPanel() {
         if (ImGui::Button("X"))
         {
             ImGui::PopStyleColor();
-            if (!simageList[i].changeButton) {
-                if (choicesImageList == i) {
-                    choicesImageList = -1;
-                }
-                else if (choicesImageList > i) {
-                    choicesImageList -= 1;
-                }
-           
-                simageList.erase(simageList.begin() + i);
-                ImGui::PopID();
-                ImGui::EndGroup();
-                break;
+            if (choicesImageList == i) {
+                choicesImageList = -1;
             }
+            else if (choicesImageList > i) {
+                choicesImageList -= 1;
+            }
+            simageList.erase(simageList.begin() + i);
+            ImGui::PopID();
+            ImGui::EndGroup();
+            break;
         }
 
         if (ImGui::Button("ボタン変更"))
@@ -202,7 +199,7 @@ void MainScreen::ConfigPanel() {
     ImGui::BeginChild("Config");
 
     ImGui::Text("設定");
-    if (choicesImageList == -1) {
+    if (choicesImageList <= -1) {
 
     }
     else {
@@ -231,7 +228,7 @@ void MainScreen::MenuPanel() {
                 OpenJson();
             }
             if (ImGui::MenuItem("保存", "Ctrl+S")) { 
-                SaveJson();
+                //SaveJson();
             }
             ImGui::EndMenu();
         }
