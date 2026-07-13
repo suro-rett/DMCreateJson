@@ -190,6 +190,7 @@ void ImageList::ResetAllImage() {
 }
 
 void ImageList::SetImageData(int Vector,std::wstring path) {
+    if (GIFcheck(path)) { return; }
     if (path != L"") {
         simagePath[Vector].imagePaths = path;
         simagePath[Vector].texture.Reset();
@@ -218,6 +219,44 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
             else if (FAILED(hr))
             {
                 OutputDebugStringA("Load Failed\n");
+            }
+        }
+    }
+    CheckSize();
+}
+void ImageList::SetImageData(std::vector<std::wstring> path) {
+    if (GIFchecks(path)) { return; }
+    for (auto& Image : path) {
+        simagePath.push_back({});
+        if (Image != L"") {
+            simagePath.back().imagePaths = Image;
+            simagePath.back().texture.Reset();
+            if (simagePath.back().imagePaths != L"NoData") {
+                simagePath.back().texture.Reset();
+
+                HRESULT hr = DirectX::CreateWICTextureFromFileEx(
+                    deviceResources->GetD3DDevice(),
+                    Image.c_str(),
+                    0,
+                    D3D11_USAGE_DEFAULT,
+                    D3D11_BIND_SHADER_RESOURCE,
+                    0,
+                    0,
+                    DirectX::WIC_LOADER_FORCE_RGBA32,
+                    nullptr,
+                    simagePath.back().texture.GetAddressOf());
+                if (SUCCEEDED(hr)) {
+                    GetTextureSize(simagePath.back().texture.Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
+                    if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
+                        simagePath.back().texture.Reset();
+                        simagePath.back().imagePaths = L"NoData";
+                        PopUpSizeError = true;
+                    }
+                }
+                else if (FAILED(hr))
+                {
+                    OutputDebugStringA("Load Failed\n");
+                }
             }
         }
     }
@@ -256,8 +295,7 @@ void ImageList::ImageDataUpdate() {
 
     if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvail().x, 100)))
     {
-        simagePath.push_back({ });
-        SetImageData((int)simagePath.size() - 1, OpenImageFileW());
+        SetImageData(OpenImageFilesW());
     }
 
     if (sizeMismatch) {
@@ -533,4 +571,51 @@ void ImageList::SetLoopButton() {
     if (ImGui::RadioButton("ON", simageData.loop))if (GetKey() != "IDLE")simageData.loop = true;
     ImGui::SameLine();
     if (ImGui::RadioButton("OFF", !simageData.loop))if (GetKey() != "IDLE")simageData.loop = false;
+}
+
+bool ImageList::GIFchecks(std::vector<std::wstring> paths) {
+
+    if (GIFALLCheck()) {
+        if (simagePath.size() != 0) {
+            std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
+            MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+            return true;
+        }
+    }
+    
+    for (auto& Image : paths) {
+        if (substrBack(WStringToString(Image), 3, 3) == "gif") {
+            if (paths.size() != 1) {
+                std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
+                MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+                return true;
+            }
+            if (simagePath.size() != 0) {
+                std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
+                MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool ImageList::GIFcheck(std::wstring path) {
+    if (substrBack(WStringToString(path), 3, 3) == "gif") {
+        if (simagePath.size() != 1) {
+            std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
+            MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ImageList::GIFALLCheck() {
+    for (auto& Image : simagePath) {
+        if (substrBack(WStringToString(Image.imagePaths), 3, 3) == "gif") {
+            return true;
+        }
+    }
+    return false;
 }

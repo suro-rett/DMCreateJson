@@ -31,6 +31,8 @@ void MainScreen::Update() {
     MenuPanel();
     if (ImGui::BeginTable("MainTable", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersInnerV))
     {
+        if (IsKeyDown(VK_CONTROL) && IsKeyPressed('S'))SaveJson();
+        if (IsKeyDown(VK_CONTROL) && IsKeyPressed('O'))OpenJson();
         KeyPanel();
         ImagePanel();
         ConfigPanel();
@@ -70,7 +72,7 @@ void MainScreen::KeyPanel() {
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.0f, 1.0f, 1.0f));
         }
         if(ImGui::Button(simageList[i].imageList.GetKey().c_str(), ImVec2(width * 0.5f, 100))){
-            if(choicesImageList != -1)simageList[choicesImageList].imageList.ResetAllImage();
+            if(choicesImageList >= 0)simageList[choicesImageList].imageList.ResetAllImage();
             choicesImageList = (int)i;
             simageList[choicesImageList].imageList.SetAllImage();
         }
@@ -228,7 +230,7 @@ void MainScreen::MenuPanel() {
                 OpenJson();
             }
             if (ImGui::MenuItem("保存", "Ctrl+S")) { 
-                //SaveJson();
+                SaveJson();
             }
             ImGui::EndMenu();
         }
@@ -315,7 +317,7 @@ void MainScreen::SaveJson() {
             }
         }
         if (a) {
-            fileName = SaveFileDialogString("新規作成", "json", GetRelativePath().c_str());
+            fileName = SaveFileDialogString("NewFile", "json", GetRelativePath().c_str());
             if (fileName == "") {
                 return;
             }

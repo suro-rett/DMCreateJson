@@ -4,6 +4,9 @@
 #include <commdlg.h>
 #include <filesystem>
 #include <fstream>
+#include <shobjidl.h>
+
+
 
 constexpr int KEY_COUNT = 256;
 
@@ -271,4 +274,118 @@ std::string SaveFileDialogString(const char* defaultName, const char* extension,
     }
 
     return "";
+}
+
+std::vector<std::wstring> OpenImageFilesW()
+{
+    std::vector<std::wstring> paths;
+
+    HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+
+    IFileOpenDialog* pDialog = nullptr;
+    hr = CoCreateInstance(
+        CLSID_FileOpenDialog,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&pDialog));
+
+    if (FAILED(hr))
+    {
+        CoUninitialize();
+        return paths;
+    }
+
+    if (!m_wlastFolder.empty())
+    {
+        IShellItem* pFolder = nullptr;
+
+        hr = SHCreateItemFromParsingName(
+            m_wlastFolder.c_str(),
+            nullptr,
+            IID_PPV_ARGS(&pFolder));
+
+        if (SUCCEEDED(hr))
+        {
+            pDialog->SetDefaultFolder(pFolder);
+            pFolder->Release();
+        }
+    }
+
+    // オプション取得
+    DWORD dwFlags = 0;
+    pDialog->GetOptions(&dwFlags);
+
+    // 複数選択可能
+    pDialog->SetOptions(
+        dwFlags |
+        FOS_ALLOWMULTISELECT |
+        FOS_FILEMUSTEXIST |
+        FOS_PATHMUSTEXIST);
+
+    // フィルタ
+    COMDLG_FILTERSPEC filters[] =
+    {
+        {
+            L"Image Files",
+            L"*.png;*.gif;*.jpg;*.jpeg;*.bmp"
+        },
+        {
+            L"All Files",
+            L"*.*"
+        }
+    };
+
+    pDialog->SetFileTypes(
+        ARRAYSIZE(filters),
+        filters);
+
+    // 表示
+    hr = pDialog->Show(nullptr);
+
+    if (SUCCEEDED(hr))
+    {
+        IShellItemArray* pResults = nullptr;
+
+        hr = pDialog->GetResults(&pResults);
+
+        if (SUCCEEDED(hr))
+        {
+            DWORD count = 0;
+            pResults->GetCount(&count);
+
+            for (DWORD i = 0; i < count; i++)
+            {
+                IShellItem* pItem = nullptr;
+
+                if (SUCCEEDED(
+                    pResults->GetItemAt(i, &pItem)))
+                {
+                    PWSTR pszFile = nullptr;
+
+                    if (SUCCEEDED(
+                        pItem->GetDisplayName(
+                            SIGDN_FILESYSPATH,
+                            &pszFile)))
+                    {
+                        paths.emplace_back(pszFile);
+
+                        CoTaskMemFree(pszFile);
+                    }
+
+                    pItem->Release();
+                }
+            }
+
+            pResults->Release();
+        }
+    }
+
+    if (paths.size() > 0) {
+        std::filesystem::path p(paths.front());
+        m_wlastFolder = p.parent_path().wstring();
+    }
+    pDialog->Release();
+    CoUninitialize();
+
+    return paths;
 }

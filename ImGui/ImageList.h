@@ -52,6 +52,9 @@ private:
 	ImVec2 SetSize(const sImagePath& imagePath);
 	void SizeError();
 	void CheckSize();
+	bool GIFchecks(std::vector<std::wstring> paths);
+	bool GIFcheck(std::wstring path);
+	bool GIFALLCheck();
 #pragma endregion
 #pragma region 設定(右)
 #pragma region プレビュー
@@ -86,6 +89,7 @@ public:
 	const std::vector<sImagePath>& GetImagePaths();
 	void SetAllImage();
 	void ResetAllImage();
+	void SetImageData(std::vector<std::wstring> path);
 	void SetImageData(int Vector, std::wstring path);
 
 	void ImageDataUpdate();

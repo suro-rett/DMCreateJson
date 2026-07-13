@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include "Windows.h"
-
+#include <vector>
 
 //GetAsyncKeyStateを使ったキー入力を更新するためのアップデート
 void UpdateKeyboard();
@@ -24,15 +24,16 @@ void PrintMemoryUsage();
 //エクスプローラーを開きイメージ画像を選択でき、絶対パスを返す
 std::string OpenImageFileA();
 std::wstring OpenImageFileW();
-
+//エクスプローラーを開きjson選択でき、絶対パスを返す
 std::wstring OpenJsonFileW();
 //受けっとったファイルパスから実行ファイルからの相対パス取得 動作不安定？
 std::string GetRelativePath(const std::string& targetPath);
-
 //実行EXEの絶対パスを返す
 std::string GetRelativePath();
 //エクスプローラーを開き引数の通りにファイルを新規・上書き保存する　
 // 第一引数:ファイルの初期名　第二引数:保存形式(拡張子)　第三引数:初期表示のディレクトリ場所
 bool SaveFileDialog(const char* defaultName, const char* extension, const char* InitialDir);
-
+//上記ファイル保存関数の返り値string型
 std::string SaveFileDialogString(const char* defaultName, const char* extension, const char* InitialDir);
+//エクスプローラーを開きイメージ画像を選択でき、絶対パスを返す 複数ファイルを一度に返せる
+std::vector<std::wstring> OpenImageFilesW();
