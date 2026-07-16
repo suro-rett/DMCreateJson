@@ -97,7 +97,6 @@ void Game::Tick()
     UpdateKeyboard();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    mainScreen.Update();
 
     m_timer.Tick([&]()
     {
@@ -111,7 +110,7 @@ void Game::Tick()
 void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
-
+    mainScreen.Update();
     //ImGui::Begin("aTestWindow");
     //{
     //    //  テキストの表示
@@ -253,5 +252,9 @@ void Game::OnDeviceRestored()
     CreateDeviceDependentResources();
 
     CreateWindowSizeDependentResources();
+}
+
+void Game::OnDropImages(std::vector<std::wstring> paths) {
+    mainScreen.OnDropImages(paths);
 }
 #pragma endregion

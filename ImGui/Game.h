@@ -45,6 +45,8 @@ public:
 
     // Properties
     void GetDefaultSize( int& width, int& height ) const noexcept;
+
+    void OnDropImages(std::vector<std::wstring> paths);
 private:
 
     void Update(DX::StepTimer const& timer);

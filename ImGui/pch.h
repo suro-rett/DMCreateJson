@@ -15,7 +15,6 @@
 
 // DirectX apps don't need GDI
 #define NODRAWTEXT
-#define NOGDI
 #define NOBITMAP
 
 // Include <mcx.h> if you need this
@@ -49,11 +48,13 @@
 #include <stdexcept>
 #include <system_error>
 #include <tuple>
+#include <Vector>
+#include <String>
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
 #endif
-
+#pragma comment(lib, "Gdiplus.lib")
 namespace DX
 {
     // Helper class for COM exceptions

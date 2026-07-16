@@ -4,6 +4,8 @@
 #include "ImageList.h"
 #include <WICTextureLoader.h>
 #include "your'ryWinAPI.h"
+#include <windows.h>
+
 
 std::string ImageList::GetKey() {
 
@@ -119,6 +121,131 @@ std::string ImageList::GetKey() {
 	return name;
 }
 
+ComPtr<ID3D11ShaderResourceView> BitmapToTexture(ID3D11Device* device, Bitmap* bitmap) {
+    BitmapData bitmapData;
+
+    Rect rect(0, 0, bitmap->GetWidth(), bitmap->GetHeight());
+
+    bitmap->LockBits(
+        &rect,
+        ImageLockModeRead,
+        PixelFormat32bppARGB,
+        &bitmapData);
+
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = bitmap->GetWidth();
+    desc.Height = bitmap->GetHeight();
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = bitmapData.Scan0;
+    initData.SysMemPitch = bitmapData.Stride;
+
+    ComPtr<ID3D11Texture2D> texture;
+
+    device->CreateTexture2D(
+        &desc,
+        &initData,
+        texture.GetAddressOf());
+
+    ComPtr<ID3D11ShaderResourceView> srv;
+
+    device->CreateShaderResourceView(
+        texture.Get(),
+        nullptr,
+        srv.GetAddressOf());
+
+    bitmap->UnlockBits(&bitmapData);
+
+    return srv;
+}
+
+bool IsSameBitmap(Bitmap* a,Bitmap* b,int colorDiffThreshold)
+{
+    if (!a || !b)
+        return false;
+
+    if (a->GetWidth() != b->GetWidth() ||
+        a->GetHeight() != b->GetHeight())
+    {
+        return false;
+    }
+
+    Rect rect(
+        0,
+        0,
+        a->GetWidth(),
+        a->GetHeight());
+
+    BitmapData dataA;
+    BitmapData dataB;
+
+    a->LockBits(
+        &rect,
+        ImageLockModeRead,
+        PixelFormat32bppARGB,
+        &dataA);
+
+    b->LockBits(
+        &rect,
+        ImageLockModeRead,
+        PixelFormat32bppARGB,
+        &dataB);
+
+    if (dataA.Stride != dataB.Stride)
+    {
+        a->UnlockBits(&dataA);
+        b->UnlockBits(&dataB);
+        return false;
+    }
+
+    BYTE* ptrA = (BYTE*)dataA.Scan0;
+    BYTE* ptrB = (BYTE*)dataB.Scan0;
+
+    const int totalBytes = dataA.Stride * a->GetHeight();
+
+    bool isSame = true;
+
+    for (int i = 0; i < totalBytes; i += 4)
+    {
+        if (ptrA[i + 3] == 0 && ptrB[i + 3] == 0) {
+            continue;
+        }
+
+        // 各チャンネルの差分を計算
+        int diffB = abs(ptrA[i] - ptrB[i]);
+
+        int diffG = abs(ptrA[i + 1] - ptrB[i + 1]);
+
+        int diffR = abs(ptrA[i + 2] - ptrB[i + 2]);
+
+        int diffA = abs(ptrA[i + 3] - ptrB[i + 3]);
+
+
+
+        //各チャンネルが閾値以内か確認
+        if (diffR > colorDiffThreshold ||
+            diffG > colorDiffThreshold ||
+            diffB > colorDiffThreshold ||
+            diffA > colorDiffThreshold)
+        {
+            isSame = false;
+            break;
+        }
+    }
+
+
+    a->UnlockBits(&dataA);
+    b->UnlockBits(&dataB);
+
+    return isSame;
+}
+
 void ImageList::SetKey(int setKey) {
 	vkey = setKey;
 }
@@ -148,6 +275,77 @@ void ImageList::SetAllImage() {
                         Path.texture.Reset();
                         Path.imagePaths = L"NoData";
                         PopUpSizeError = true;
+                    }
+                }
+                if (substrBack(WStringToString(Path.imagePaths), 3, 3) == "gif") {
+
+                    Bitmap gif(Path.imagePaths.c_str());
+
+                    if (gif.GetLastStatus() != Ok)
+                    {
+                        return;
+                    }
+
+                    UINT dimCount = gif.GetFrameDimensionsCount();
+
+                    if (dimCount == 0)
+                    {
+                        return;
+                    }
+
+                    std::vector<GUID> dimensions(dimCount);
+
+                    gif.GetFrameDimensionsList(dimensions.data(), dimCount);
+
+                    GUID dimensionGuid = dimensions[0];
+
+
+                    UINT frameCount = gif.GetFrameCount(&dimensionGuid);
+
+                    UINT size = gif.GetPropertyItemSize(PropertyTagFrameDelay);
+
+                    std::vector<int> delays;
+
+                    if (size > 0)
+                    {
+                        PropertyItem* delayItem = (PropertyItem*)malloc(size);
+
+                        if (delayItem)
+                        {
+                            Status status = gif.GetPropertyItem(PropertyTagFrameDelay, size, delayItem);
+
+                            if (status == Ok)
+                            {
+                                for (UINT i = 0; i < frameCount; i++)
+                                {
+                                    gif.SelectActiveFrame(&dimensionGuid, i);
+
+                                    auto frame = Bitmap(gif.GetWidth(), gif.GetHeight(), PixelFormat32bppARGB);
+
+                                    Graphics g(&frame);
+
+                                    g.DrawImage(&gif, 0, 0);
+
+                                    if (simagePath.back().GIFTexture.size() != 0) {
+                                        simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                    }
+                                    else {
+                                        simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                        GetTextureSize(simagePath.back().GIFTexture[0].Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
+                                        if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
+                                            simagePath.back().texture.Reset();
+                                            simagePath.back().GIFTexture.clear();
+                                            simagePath.back().imagePaths = L"NoData";
+                                            PopUpSizeError = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                            free(delayItem);
+                        }
                     }
                 }
             }
@@ -185,6 +383,9 @@ void ImageList::ResetAllImage() {
             if (Path.texture != nullptr) {
                 Path.texture.Reset();
             }
+            if (Path.GIFTexture.size() != 0) {
+                Path.GIFTexture.clear();
+            }
         }
     }
 }
@@ -194,9 +395,8 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
     if (path != L"") {
         simagePath[Vector].imagePaths = path;
         simagePath[Vector].texture.Reset();
+        simagePath.back().GIFTexture.clear();
         if (simagePath[Vector].imagePaths != L"NoData") {
-            simagePath[Vector].texture.Reset();
-
             HRESULT hr = DirectX::CreateWICTextureFromFileEx(
                 deviceResources->GetD3DDevice(),
                 path.c_str(),
@@ -220,10 +420,82 @@ void ImageList::SetImageData(int Vector,std::wstring path) {
             {
                 OutputDebugStringA("Load Failed\n");
             }
+            if (substrBack(WStringToString(simagePath[Vector].imagePaths), 3, 3) == "gif") {
+
+                Bitmap gif(simagePath[Vector].imagePaths.c_str());
+
+                if (gif.GetLastStatus() != Ok)
+                {
+                    return;
+                }
+
+                UINT dimCount = gif.GetFrameDimensionsCount();
+
+                if (dimCount == 0)
+                {
+                    return;
+                }
+
+                std::vector<GUID> dimensions(dimCount);
+
+                gif.GetFrameDimensionsList(dimensions.data(), dimCount);
+
+                GUID dimensionGuid = dimensions[0];
+
+
+                UINT frameCount = gif.GetFrameCount(&dimensionGuid);
+
+                UINT size = gif.GetPropertyItemSize(PropertyTagFrameDelay);
+
+                std::vector<int> delays;
+
+                if (size > 0)
+                {
+                    PropertyItem* delayItem = (PropertyItem*)malloc(size);
+
+                    if (delayItem)
+                    {
+                        Status status = gif.GetPropertyItem(PropertyTagFrameDelay, size, delayItem);
+
+                        if (status == Ok)
+                        {
+                            for (UINT i = 0; i < frameCount; i++)
+                            {
+                                gif.SelectActiveFrame(&dimensionGuid, i);
+
+                                auto frame = Bitmap(gif.GetWidth(), gif.GetHeight(), PixelFormat32bppARGB);
+
+                                Graphics g(&frame);
+
+                                g.DrawImage(&gif, 0, 0);
+
+                                if (simagePath.back().GIFTexture.size() != 0) {
+                                    simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                }
+                                else {
+                                    simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                    GetTextureSize(simagePath.back().GIFTexture[0].Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
+                                    if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
+                                        simagePath.back().texture.Reset();
+                                        simagePath.back().GIFTexture.clear();
+                                        simagePath.back().imagePaths = L"NoData";
+                                        PopUpSizeError = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        free(delayItem);
+                    }
+                }
+            }
         }
     }
     CheckSize();
 }
+
 void ImageList::SetImageData(std::vector<std::wstring> path) {
     if (GIFchecks(path)) { return; }
     for (auto& Image : path) {
@@ -231,37 +503,110 @@ void ImageList::SetImageData(std::vector<std::wstring> path) {
         if (Image != L"") {
             simagePath.back().imagePaths = Image;
             simagePath.back().texture.Reset();
+            simagePath.back().GIFTexture.clear();
             if (simagePath.back().imagePaths != L"NoData") {
-                simagePath.back().texture.Reset();
+                    HRESULT hr = DirectX::CreateWICTextureFromFileEx(
+                        deviceResources->GetD3DDevice(),
+                        Image.c_str(),
+                        0,
+                        D3D11_USAGE_DEFAULT,
+                        D3D11_BIND_SHADER_RESOURCE,
+                        0,
+                        0,
+                        DirectX::WIC_LOADER_FORCE_RGBA32,
+                        nullptr,
+                        simagePath.back().texture.GetAddressOf());
+                    if (SUCCEEDED(hr)) {
+                        GetTextureSize(simagePath.back().texture.Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
+                        if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
+                            simagePath.back().texture.Reset();
+                            simagePath.back().imagePaths = L"NoData";
+                            PopUpSizeError = true;
+                        }
+                    }
+                    else if (FAILED(hr))
+                    {
+                        OutputDebugStringA("Load Failed\n");
+                    }
+            }
+            if (substrBack(WStringToString(Image), 3, 3) == "gif") {
 
-                HRESULT hr = DirectX::CreateWICTextureFromFileEx(
-                    deviceResources->GetD3DDevice(),
-                    Image.c_str(),
-                    0,
-                    D3D11_USAGE_DEFAULT,
-                    D3D11_BIND_SHADER_RESOURCE,
-                    0,
-                    0,
-                    DirectX::WIC_LOADER_FORCE_RGBA32,
-                    nullptr,
-                    simagePath.back().texture.GetAddressOf());
-                if (SUCCEEDED(hr)) {
-                    GetTextureSize(simagePath.back().texture.Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
-                    if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
-                        simagePath.back().texture.Reset();
-                        simagePath.back().imagePaths = L"NoData";
-                        PopUpSizeError = true;
+                Bitmap gif(Image.c_str());
+
+                if (gif.GetLastStatus() != Ok)
+                {
+                    return;
+                }
+
+                UINT dimCount = gif.GetFrameDimensionsCount();
+
+                if (dimCount == 0)
+                {
+                    return;
+                }
+
+                std::vector<GUID> dimensions(dimCount);
+
+                gif.GetFrameDimensionsList(dimensions.data(), dimCount);
+
+                GUID dimensionGuid = dimensions[0];
+
+
+                UINT frameCount = gif.GetFrameCount(&dimensionGuid);
+
+                UINT size = gif.GetPropertyItemSize(PropertyTagFrameDelay);
+
+                std::vector<int> delays;
+
+                if (size > 0)
+                {
+                    PropertyItem* delayItem = (PropertyItem*)malloc(size);
+
+                    if (delayItem)
+                    {
+                        Status status = gif.GetPropertyItem(PropertyTagFrameDelay, size, delayItem);
+
+                        if (status == Ok)
+                        {
+                            for (UINT i = 0; i < frameCount; i++)
+                            {
+                                gif.SelectActiveFrame(&dimensionGuid, i);
+
+                                auto frame = Bitmap(gif.GetWidth(), gif.GetHeight(), PixelFormat32bppARGB);
+
+                                Graphics g(&frame);
+
+                                g.DrawImage(&gif, 0, 0);
+
+                                if (simagePath.back().GIFTexture.size() != 0) {
+                                    simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                }
+                                else {
+                                    simagePath.back().GIFTexture.push_back(BitmapToTexture(deviceResources->GetD3DDevice(), &frame));
+
+                                    GetTextureSize(simagePath.back().GIFTexture[0].Get(), simagePath.back().textureWidth, simagePath.back().textureHeight);
+                                    if (simagePath.back().textureWidth % 2 == 1 || simagePath.back().textureHeight % 2 == 1) {
+                                        simagePath.back().texture.Reset();
+                                        simagePath.back().GIFTexture.clear();
+                                        simagePath.back().imagePaths = L"NoData";
+                                        PopUpSizeError = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        free(delayItem);
                     }
                 }
-                else if (FAILED(hr))
-                {
-                    OutputDebugStringA("Load Failed\n");
-                }
+
             }
         }
+        CheckSize();
     }
-    CheckSize();
 }
+
+
 
 void ImageList::SizeError() {
     ImGui::SetNextWindowSize(ImVec2(500, 200));
@@ -295,7 +640,13 @@ void ImageList::ImageDataUpdate() {
 
     if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvail().x, 100)))
     {
-        SetImageData(OpenImageFilesW());
+        if (GIFALLCheck()) {
+            std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\n設定してるGIF画像を消してからもう一度お試しください\n";
+            MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+        }
+        else {
+            SetImageData(OpenImageFilesW());
+        }
     }
 
     if (sizeMismatch) {
@@ -404,12 +755,23 @@ void ImageList::ConfigUpdate() {
 
     ChangeCurrentFrame();
     
-    if (currentImageFrame < simagePath.size()) {
-        float previewscale = std::min(previewSize.x / simagePath[currentImageFrame].textureWidth, previewSize.y / simagePath[currentImageFrame].textureHeight);
+    if (simagePath.size()> 0 && simagePath[0].GIFTexture.size() <= 0) {
+        if (currentImageFrame < simagePath.size()) {
+            float previewscale = std::min(previewSize.x / simagePath[currentImageFrame].textureWidth, previewSize.y / simagePath[currentImageFrame].textureHeight);
 
-        ImVec2 imageSize(simagePath[currentImageFrame].textureWidth * previewscale, simagePath[currentImageFrame].textureHeight * previewscale);
-        ImVec2 imagePos(previewPos.x + (previewSize.x - imageSize.x) * 0.5f, previewPos.y + (previewSize.y - imageSize.y) * 0.5f);
-        previewdraw->AddImage((ImTextureID)simagePath[currentImageFrame].texture.Get(),imagePos,ImVec2(imagePos.x + imageSize.x,imagePos.y + imageSize.y));
+            ImVec2 imageSize(simagePath[currentImageFrame].textureWidth * previewscale, simagePath[currentImageFrame].textureHeight * previewscale);
+            ImVec2 imagePos(previewPos.x + (previewSize.x - imageSize.x) * 0.5f, previewPos.y + (previewSize.y - imageSize.y) * 0.5f);
+            previewdraw->AddImage((ImTextureID)simagePath[currentImageFrame].texture.Get(), imagePos, ImVec2(imagePos.x + imageSize.x, imagePos.y + imageSize.y));
+        }
+    }
+    else {
+        if (simagePath.size() > 0 && currentImageFrame < simagePath[0].GIFTexture.size()) {
+            float previewscale = std::min(previewSize.x / simagePath[0].textureWidth, previewSize.y / simagePath[0].textureHeight);
+
+            ImVec2 imageSize(simagePath[0].textureWidth * previewscale, simagePath[0].textureHeight * previewscale);
+            ImVec2 imagePos(previewPos.x + (previewSize.x - imageSize.x) * 0.5f, previewPos.y + (previewSize.y - imageSize.y) * 0.5f);
+            previewdraw->AddImage((ImTextureID)simagePath[0].GIFTexture[currentImageFrame].Get(), imagePos, ImVec2(imagePos.x + imageSize.x, imagePos.y + imageSize.y));
+        }
     }
 
     ScalePreview();
@@ -430,6 +792,9 @@ void ImageList::ChangeCurrentFrame() {
 
 bool ImageList::CheckImage() {
     for (auto& Path : simagePath) {
+        if (Path.GIFTexture.size() > 0) {
+            return true;
+        }
         if (Path.texture != nullptr) {
             return true;
         }
@@ -447,20 +812,39 @@ bool ImageList::CheckImagePath() {
 }
 
 void ImageList::setCurrentFrame() {
-    int iniFrame = currentImageFrame;
-    for (int i = 0; i<simagePath.size(); i++) {
-        if (iniFrame + 1 >= simagePath.size()) {
-            iniFrame = 0;
-        }
-        else {
-            iniFrame++;
-        }
+    if (simagePath[0].GIFTexture.size() == 0) {
+        int iniFrame = currentImageFrame;
+        for (int i = 0; i < simagePath.size(); i++) {
+            if (iniFrame + 1 >= simagePath.size()) {
+                iniFrame = 0;
+            }
+            else {
+                iniFrame++;
+            }
 
-        if (simagePath[iniFrame].texture != nullptr) {
-            currentImageFrame = iniFrame;
-            break;
+            if (simagePath[iniFrame].texture != nullptr) {
+                currentImageFrame = iniFrame;
+                break;
+            }
         }
     }
+    else {
+        int iniFrame = currentImageFrame;
+        for (int i = 0; i < simagePath[0].GIFTexture.size(); i++) {
+            if (iniFrame + 1 >= simagePath[0].GIFTexture.size()) {
+                iniFrame = 0;
+            }
+            else {
+                iniFrame++;
+            }
+
+            if (simagePath[0].GIFTexture[iniFrame] != nullptr) {
+                currentImageFrame = iniFrame;
+                break;
+            }
+        }
+    }
+
 }
 
 void ImageList::ScalePreview() {
@@ -519,19 +903,34 @@ void ImageList::ScalePreview() {
             ImGuiWindowFlags_NoScrollbar
             ))
         {
-            float width = static_cast<float>(simagePath[currentImageFrame].textureWidth) * simageData.scale;
-            float height = static_cast<float>(simagePath[currentImageFrame].textureHeight) * simageData.scale;
-            ImVec2 avail = ImGui::GetContentRegionAvail();
+            if (simagePath[0].GIFTexture.size() == 0) {
+                float width = static_cast<float>(simagePath[currentImageFrame].textureWidth) * simageData.scale;
+                float height = static_cast<float>(simagePath[currentImageFrame].textureHeight) * simageData.scale;
+                ImVec2 avail = ImGui::GetContentRegionAvail();
 
-            // ウィンドウサイズを画像サイズに合わせる
-            ImVec2 padding = ImGui::GetStyle().WindowPadding;
+                // ウィンドウサイズを画像サイズに合わせる
+                ImVec2 padding = ImGui::GetStyle().WindowPadding;
 
-            float title = ImGui::GetFrameHeight();
+                float title = ImGui::GetFrameHeight();
 
-            ImGui::SetWindowSize(ImVec2(width + padding.x * 2,height + padding.y * 2 + title));
+                ImGui::SetWindowSize(ImVec2(width + padding.x * 2, height + padding.y * 2 + title));
 
-            ImGui::Image((ImTextureID)simagePath[currentImageFrame].texture.Get(),ImVec2(width, height));
+                ImGui::Image((ImTextureID)simagePath[currentImageFrame].texture.Get(), ImVec2(width, height));
+            }
+            else {
+                float width = static_cast<float>(simagePath[0].textureWidth) * simageData.scale;
+                float height = static_cast<float>(simagePath[0].textureHeight) * simageData.scale;
+                ImVec2 avail = ImGui::GetContentRegionAvail();
 
+                // ウィンドウサイズを画像サイズに合わせる
+                ImVec2 padding = ImGui::GetStyle().WindowPadding;
+
+                float title = ImGui::GetFrameHeight();
+
+                ImGui::SetWindowSize(ImVec2(width + padding.x * 2, height + padding.y * 2 + title));
+
+                ImGui::Image((ImTextureID)simagePath[0].GIFTexture[currentImageFrame].Get(), ImVec2(width, height));
+            }
             if (IsKeyReleased(VK_ESCAPE))
             {
                 ImGui::CloseCurrentPopup();
@@ -601,11 +1000,13 @@ bool ImageList::GIFchecks(std::vector<std::wstring> paths) {
 }
 
 bool ImageList::GIFcheck(std::wstring path) {
-    if (substrBack(WStringToString(path), 3, 3) == "gif") {
-        if (simagePath.size() != 1) {
-            std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
-            MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
-            return true;
+    if (path != L"") {
+        if (substrBack(WStringToString(path), 3, 3) == "gif") {
+            if (simagePath.size() != 1) {
+                std::wstring message = L"GIF画像と他の種類の画像を混ぜることは出来ません\nまたはGIF画像を二つ以上くっつけることは出来ません\n";
+                MessageBoxW(NULL, message.c_str(), L"Error", MB_OK);
+                return true;
+            }
         }
     }
     return false;
@@ -619,3 +1020,19 @@ bool ImageList::GIFALLCheck() {
     }
     return false;
 }
+
+void ImageList::OnDropImages(std::vector<std::wstring> paths) {
+    std::vector<std::wstring> putonPaths;
+    for (auto& path : paths) {
+        if (path != L"") {
+            std::string extension = substrBack(WStringToString(path), 3, 3);
+            if (extension == "gif" || extension == "png"|| extension == "jpg" || extension == "bmp" || extension == "jpe") {
+                putonPaths.push_back(path);
+            }
+        }
+    }
+    if (putonPaths.size() > 0) {
+        SetImageData(putonPaths);
+    }
+}
+

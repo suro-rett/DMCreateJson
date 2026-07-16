@@ -1,11 +1,13 @@
-//
+Ôªø//
 // Main.cpp
 //
 
 #include "pch.h"
 #include "Game.h"
 #include "imgui_impl_win32.h"
+#include <shellapi.h>
 
+ULONG_PTR gdiplusToken;
 using namespace DirectX;
 
 #ifdef __clang__
@@ -58,7 +60,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         wcex.hIcon = LoadIconW(hInstance, L"IDI_ICON");
         wcex.hCursor = LoadCursorW(nullptr, (LPCWSTR)IDC_ARROW);
         wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
-        wcex.lpszClassName = L"DMCreateJsonImGuiWindowClass";
+        wcex.lpszClassName = L"DMCreateJson";
         wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
         if (!RegisterClassExW(&wcex))
             return 1;
@@ -71,24 +73,22 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
-        HWND hwnd = CreateWindowExW(0, L"DMCreateJsonImGuiWindowClass", g_szAppName, WS_OVERLAPPEDWINDOW,
+        HWND hwnd = CreateWindowExW(0, L"DMCreateJson", g_szAppName, WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top,
             nullptr, nullptr, hInstance,
             g_game.get());
-        // TODO: Change to CreateWindowExW(WS_EX_TOPMOST, L"DMCreateJsonImGuiWindowClass", g_szAppName, WS_POPUP,
-        // to default to fullscreen.
 
         if (!hwnd)
             return 1;
-
+        DragAcceptFiles(hwnd, TRUE);
         ShowWindow(hwnd, nCmdShow);
-        // TODO: Change nCmdShow to SW_SHOWMAXIMIZED to default to fullscreen.
 
         GetClientRect(hwnd, &rc);
 
         g_game->Initialize(hwnd, rc.right - rc.left, rc.bottom - rc.top);
     }
-
+    GdiplusStartupInput input;
+    GdiplusStartup(&gdiplusToken, &input, nullptr);
     // Main message loop
     MSG msg = {};
     while (WM_QUIT != msg.message)
@@ -115,7 +115,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-    //  ImGuiÇÃÉÅÉbÉZÅ[ÉWèàóù
+    //  ImGui„ÅÆ„É°„ÉÉ„Çª„Éº„Ç∏Âá¶ÁêÜ
     extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
         return true;
@@ -137,7 +137,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(params->lpCreateParams));
         }
         break;
+    case WM_DROPFILES:
+    {
+        HDROP hDrop = (HDROP)wParam;
 
+        UINT fileCount = DragQueryFileW(hDrop, 0xFFFFFFFF, nullptr, 0);
+
+        std::vector<std::wstring> paths;
+
+        for (UINT i = 0; i < fileCount; i++)
+        {
+            wchar_t path[MAX_PATH];
+
+            DragQueryFileW(hDrop, i, path, MAX_PATH);
+
+            paths.push_back(path);
+        }
+        game->OnDropImages(paths);
+        DragFinish(hDrop);
+        break;
+    }
     case WM_PAINT:
         if (s_in_sizemove && game)
         {
@@ -288,6 +307,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // to any mnemonic or accelerator key. Ignore so we don't produce an error beep.
         return MAKELRESULT(0, MNC_CLOSE);
     }
+
+
 
     return DefWindowProc(hWnd, message, wParam, lParam);
 }

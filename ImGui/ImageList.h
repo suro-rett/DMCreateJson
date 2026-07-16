@@ -1,14 +1,13 @@
 ﻿#pragma once
-#include <String>
-#include <memory>
-#include <Vector>
-#include "Windows.h"
-
 #include <wrl/client.h>
 #include <d3d11.h>
 #include "DeviceResources.h"
 #include "imgui.h"
 #include "StepTimer.h"
+
+#include <gdiplus.h>
+
+using namespace Gdiplus;
 
 using Microsoft::WRL::ComPtr;
 #define MAXHEIGHT 300.0f
@@ -19,6 +18,7 @@ struct sImagePath
 {
 	std::wstring imagePaths = L"NoData";
 	ComPtr<ID3D11ShaderResourceView> texture;
+	std::vector<ComPtr<ID3D11ShaderResourceView>> GIFTexture;
 
 	UINT textureWidth  = 0;
 	UINT textureHeight = 0;
@@ -31,6 +31,9 @@ struct sImageData
 	float scale = 1.0f;
 	bool loop = true;
 };
+
+ComPtr<ID3D11ShaderResourceView> BitmapToTexture(ID3D11Device* device, Bitmap* bitmap);
+bool IsSameBitmap(Bitmap* a, Bitmap* b, int colorDiffThreshold = 5);
 
 class ImageList {
 private:
@@ -91,6 +94,8 @@ public:
 	void ResetAllImage();
 	void SetImageData(std::vector<std::wstring> path);
 	void SetImageData(int Vector, std::wstring path);
+
+	void OnDropImages(std::vector<std::wstring> paths);
 
 	void ImageDataUpdate();
 	void ConfigUpdate();

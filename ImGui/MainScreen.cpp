@@ -6,7 +6,6 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
-#include <Vector>
 #include "your'ryWinAPI.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -358,5 +357,11 @@ void MainScreen::SaveJson() {
     if (ofs)
     {
         ofs << std::setw(2) << j;
+    }
+}
+
+void MainScreen::OnDropImages(std::vector<std::wstring> paths) {
+    if (choicesImageList >= 0) {
+        simageList[choicesImageList].imageList.OnDropImages(paths);
     }
 }

@@ -21,6 +21,8 @@ public:
 
 	MainScreen(DX::DeviceResources* DeviceResource, DX::StepTimer* time) :deviceResources(DeviceResource),m_time(time){}
 	MainScreen():deviceResources(nullptr), m_time(nullptr) {}
+
+	void OnDropImages(std::vector<std::wstring> paths);
 private:
 	void KeyPanel();
 	void ImagePanel();
