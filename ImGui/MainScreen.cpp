@@ -9,6 +9,7 @@
 #include "your'ryWinAPI.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <filesystem>
 
 using json = nlohmann::json;
 
@@ -316,7 +317,11 @@ void MainScreen::SaveJson() {
             }
         }
         if (a) {
-            fileName = SaveFileDialogString("NewFile", "json", GetRelativePath().c_str());
+            if (!std::filesystem::is_directory("DMjson")) {
+                std::filesystem::create_directories("DMjson");
+            }
+            std::string folder = GetRelativePath() + "DMjson\\";
+            fileName = SaveFileDialogString("NewFile", "json", folder.c_str());
             if (fileName == "") {
                 return;
             }

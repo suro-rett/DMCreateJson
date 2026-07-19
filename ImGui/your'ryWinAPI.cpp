@@ -173,26 +173,26 @@ std::wstring OpenJsonFileW()
     return L"";
 }
 
-std::string GetRelativePath(const std::string& targetPath)
-{
-    char exePath[MAX_PATH];
-    GetModuleFileNameA(nullptr, exePath, MAX_PATH);
-
-    std::filesystem::path exeDir =
-        std::filesystem::path(exePath).parent_path();
-
-    std::string root = exeDir.string();
-
-    if (!root.empty() && root.back() != '\\')
-        root += '\\';
-
-    if (targetPath.rfind(root, 0) == 0)
-    {
-        return targetPath.substr(root.size());
-    }
-
-    return targetPath;
-}
+//std::string GetRelativePathaa(const std::string& targetPath)
+//{
+//    char exePath[MAX_PATH];
+//    GetModuleFileNameA(nullptr, exePath, MAX_PATH);
+//
+//    std::filesystem::path exeDir =
+//        std::filesystem::path(exePath).parent_path();
+//
+//    std::string root = exeDir.string();
+//
+//    if (!root.empty() && root.back() != '\\')
+//        root += '\\';
+//
+//    if (targetPath.rfind(root, 0) == 0)
+//    {
+//        return targetPath.substr(root.size());
+//    }
+//
+//    return targetPath;
+//}
 
 std::string GetRelativePath()
 {

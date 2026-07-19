@@ -27,7 +27,7 @@ std::wstring OpenImageFileW();
 //エクスプローラーを開きjson選択でき、絶対パスを返す
 std::wstring OpenJsonFileW();
 //受けっとったファイルパスから実行ファイルからの相対パス取得 動作不安定？
-std::string GetRelativePath(const std::string& targetPath);
+//std::string GetRelativePath(const std::string& targetPath);
 //実行EXEの絶対パスを返す
 std::string GetRelativePath();
 //エクスプローラーを開き引数の通りにファイルを新規・上書き保存する　
