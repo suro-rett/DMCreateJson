@@ -2,6 +2,8 @@
 #include "ImageList.h"
 #include "DeviceResources.h"
 #include "imgui.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 struct sImageList
 {
@@ -32,6 +34,7 @@ private:
 	void MenuPanel();
 	void OpenJson();
 	void SaveJson();
+	bool JsonCheck(json j, const std::wstring& jsonName);
 #pragma endregion
 
 

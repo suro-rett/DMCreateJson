@@ -8,10 +8,9 @@
 #include "imgui_impl_dx11.h"
 #include "your'ryWinAPI.h"
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include <filesystem>
 
-using json = nlohmann::json;
+
 
 void MainScreen::Update() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -253,42 +252,13 @@ void MainScreen::OpenJson() {
 
             file >> j;
 
-            bool File = true;
-
-            if (!j.contains("imageData"))
-            {
-                MessageBoxW(
-                    nullptr,
-                    L"このアプリ用のJSONファイルではありません。",
-                    L"エラー",
-                    MB_OK | MB_ICONERROR);
-
+            if (!JsonCheck(j, FileName)) {
                 return;
-            }
-
-            for (const auto& img : j["imageData"])
-            {
-                if (!img.contains("type") ||
-                    !img.contains("paths") ||
-                    !img.contains("frameMs") ||
-                    !img.contains("scale") ||
-                    !img.contains("loop"))
-                {
-                    MessageBoxW(
-                        nullptr,
-                        L"JSONの形式が正しくありません。",
-                        L"エラー",
-                        MB_OK | MB_ICONERROR);
-                    File = false;
-                    return;
-                }
             }
 
             simageList.clear();
             choicesImageList = -1;
 
-            
-            //imageData.emplace_back();
             for (const auto& img : j["imageData"])
             {
                 sImageData imageData{img["frameMs"].get<int>(),img["scale"].get<float>(),img["loop"].get<bool>() };
@@ -371,4 +341,56 @@ void MainScreen::OnDropImages(std::vector<std::wstring> paths) {
     if (choicesImageList >= 0) {
         simageList[choicesImageList].imageList.OnDropImages(paths);
     }
+}
+
+bool MainScreen::JsonCheck(json j, const std::wstring& jsonName) {
+    if (!j.contains("imageData"))
+    {
+        std::wstring message = L"このアプリ用のJSONファイルではありません。\n ファイル名：" + jsonName;
+        MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+
+        return false;
+    }
+
+    for (const auto& img : j["imageData"])
+    {
+        if (!img.contains("type") ||
+            !img.contains("paths") ||
+            !img.contains("frameMs") ||
+            !img.contains("scale") ||
+            !img.contains("loop")
+            )
+        {
+            std::wstring message = L"JSONの形式が正しくありません。\n ファイル名：" + jsonName;
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (!img["type"].is_number_integer()) {
+            std::wstring message = L"JSONの形式が正しくありません。\n ファイル名：" + jsonName + L": type";
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (!img["paths"].is_array()) {
+            std::wstring message =L"JSONの形式が正しくありません。\n ファイル名：" + jsonName + L": paths";
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (!img["frameMs"].is_number_integer()) {
+            std::wstring message = L"JSONの形式が正しくありません。\n ファイル名：" + jsonName + L": frameMs";
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (!img["scale"].is_number_float()) {
+            std::wstring message = L"JSONの形式が正しくありません。\n ファイル名：" + jsonName + L": scale";
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+        if (!img["loop"].is_boolean()) {
+            std::wstring message = L"JSONの形式が正しくありません。\n ファイル名：" + jsonName + L": loop";
+            MessageBox(NULL, message.c_str(), L"Error", MB_OK | MB_ICONERROR);
+            return false;
+        }
+    }
+
+    return true;
 }
