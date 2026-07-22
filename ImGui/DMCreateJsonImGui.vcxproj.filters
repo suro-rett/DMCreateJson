@@ -64,6 +64,7 @@
     <ClInclude Include="your%27ryWinAPI.h">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeviceResources.cpp">
@@ -110,19 +111,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resource.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="directx.ico">
-      <Filter>Assets</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <Manifest Include="settings.manifest">
       <Filter>Assets</Filter>
     </Manifest>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DMCreateJsonImGui.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="DMJson.ico">
+      <Filter>Assets</Filter>
+    </Image>
   </ItemGroup>
 </Project>

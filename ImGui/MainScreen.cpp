@@ -287,10 +287,13 @@ void MainScreen::SaveJson() {
             }
         }
         if (a) {
-            if (!std::filesystem::is_directory("DMjson")) {
+            std::filesystem::path exeDir = GetRelativePath();
+
+            std::filesystem::path jsonDir = exeDir / "DMjson";
+            if (!std::filesystem::exists(jsonDir)) {
                 std::filesystem::create_directories("DMjson");
             }
-            std::string folder = GetRelativePath() + "DMjson\\";
+            std::string folder = GetRelativePath() + "DMjson";
             fileName = SaveFileDialogString("NewFile", "json", folder.c_str());
             if (fileName == "") {
                 return;

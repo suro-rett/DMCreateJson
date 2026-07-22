@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "imgui_impl_win32.h"
 #include <shellapi.h>
+#include "resource.h"
 
 ULONG_PTR gdiplusToken;
 using namespace DirectX;
@@ -57,11 +58,11 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         wcex.style = CS_HREDRAW | CS_VREDRAW;
         wcex.lpfnWndProc = WndProc;
         wcex.hInstance = hInstance;
-        wcex.hIcon = LoadIconW(hInstance, L"IDI_ICON");
+        wcex.hIcon = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON1));
         wcex.hCursor = LoadCursorW(nullptr, (LPCWSTR)IDC_ARROW);
         wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
         wcex.lpszClassName = L"DMCreateJson";
-        wcex.hIconSm = LoadIconW(wcex.hInstance, L"IDI_ICON");
+        wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON1));
         if (!RegisterClassExW(&wcex))
             return 1;
 
