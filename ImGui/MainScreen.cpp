@@ -280,13 +280,13 @@ void MainScreen::OpenJson() {
 void MainScreen::SaveJson() {
     std::string fileName;
     if (simageList.size() != 0) {
-        bool a = false;
+        bool checkImage = false;
         for (auto& List : simageList) {
-            if (!a) {
-                a = List.imageList.CheckImagePath();
+            if (!checkImage) {
+                checkImage = List.imageList.CheckImagePath();
             }
         }
-        if (a) {
+        if (checkImage) {
             std::filesystem::path exeDir = GetRelativePath();
 
             std::filesystem::path jsonDir = exeDir / "DMjson";
