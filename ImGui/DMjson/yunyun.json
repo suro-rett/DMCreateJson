@@ -1,0 +1,38 @@
+{
+  "imageData": [
+    {
+      "frameMs": 16,
+      "loop": true,
+      "paths": [
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_1.gif"
+      ],
+      "scale": 0.3499999940395355,
+      "type": 256
+    },
+    {
+      "frameMs": 95,
+      "loop": true,
+      "paths": [
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_01.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_02.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_03.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_04.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_05.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_06.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_07.png",
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_huwahuwa\\yunyun_huwahuwa_2_08.png"
+      ],
+      "scale": 0.3499999940395355,
+      "type": 256
+    },
+    {
+      "frameMs": 30,
+      "loop": false,
+      "paths": [
+        "C:\\Users\\yuki_\\OneDrive\\ドキュメント\\DesktopMascot\\images\\yunyun_chu\\yunyun_chu0.gif"
+      ],
+      "scale": 0.3499999940395355,
+      "type": 13
+    }
+  ]
+}
